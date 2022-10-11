@@ -1,9 +1,10 @@
 import math
 import pygame as pg
 from pygame import Surface
-from pygame import Sprite
+from pygame.sprite import Sprite
 
 from vector import Vector
+import game as gm
 
 class Maze(Sprite):
     ## TILE STATES
@@ -14,7 +15,7 @@ class Maze(Sprite):
     # 4 = ghost house entrance
 
     ## PIXEL DIMENSIONS
-    # maze is 28x28 tiles (each tile having a state as described above)
+    # maze is 28x31 tiles (each tile having a state as described above)
     # each tile is 3*(8x8) = 24x24 pixels
 
     FRESH_MAZE = (
@@ -33,7 +34,9 @@ class Maze(Sprite):
         '0000002001000440001002000000'
         '0000002001011111101002000000'
         '1111112111011111101112111111'
-        '0000002001011111101112000000'
+        '0000002001011111101002000000'
+        '0000002001000000001002000000'
+        '0000002001111111111002000000'
         '0000002001000000001002000000'
         '0000002001000000001002000000'
         '0222222222222002222222222220'
@@ -51,10 +54,14 @@ class Maze(Sprite):
 
     @staticmethod
     def pixel2tile(px: Vector):
-        return px/3
+        return px/24
     
+    @staticmethod
     def tile2pixel(tile: Vector):
-        return tile*3
+        return tile*24
+    
+    def tile2pixelctr(tile: Vector):
+        return tile*24 + Vector(12, 12)
 
     @staticmethod
     def vec2strpos(coord: Vector):
@@ -62,8 +69,15 @@ class Maze(Sprite):
         x, y = math.floor(coord.x), math.floor(coord.y)
         return x + 28*y
 
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
+        self.screen = game.screen
         self.maze = Maze.FRESH_MAZE
+        self.image = pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/maze.png')
+        self.rect = self.image.get_rect()
+        self.object = {
+            0: pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/maze.png')
+        }
     
     def get_tile_state(self, vec: Vector):
         strpos = Maze.vec2strpos(vec)
@@ -77,17 +91,21 @@ class Maze(Sprite):
         if state == 0: # (why are we eating a wall?)
             raise ValueError('tried to consume a wall!')
         elif state == 2: # food pellet
+            self.maze[strpos] = 1
             # TODO: change score, counters
-            self.maze[strpos] = 1
         elif state == 3: # power pellet
-            # TODO: change score, counters, flee state
             self.maze[strpos] = 1
+            # TODO: change score, counters, flee state
 
     def reset(self):
         self.maze = Maze.FRESH_MAZE
 
     def draw(self):
-        pass
+        # draw maze
+        rect = self.rect
+        rect.center = self.screen.get_rect().center
+        self.screen.blit(self.image, rect)
+        # TODO: draw objects currently in maze (ie. food pellets)
 
     def update(self):
         self.draw()
