@@ -60,6 +60,7 @@ class Maze(Sprite):
     def tile2pixel(tile: Vector):
         return tile*24
     
+    @staticmethod
     def tile2pixelctr(tile: Vector):
         return tile*24 + Vector(12, 12)
 
@@ -75,8 +76,9 @@ class Maze(Sprite):
         self.maze = Maze.FRESH_MAZE
         self.image = pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
-        self.object = {
-            0: pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/maze.png')
+        self.object_imgs = {
+            2: pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/food_pellet.png'),
+            3: pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/power_food.png')
         }
     
     def get_tile_state(self, vec: Vector):
