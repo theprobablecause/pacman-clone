@@ -12,7 +12,7 @@ class Menu():
         pg.display.set_caption("PACMAN Menu")
     
     def get_font(self, size):
-        return pg.font.Font("font.ttf", size)
+        return pg.font.Font("resources/fonts/Press Start 2P.ttf", size)
 
     def high_score_screen(self):
         while True:
