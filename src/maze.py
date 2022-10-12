@@ -14,7 +14,7 @@ class Maze(Sprite):
     # 3 = power pellet
     # 4 = ghost house entrance
 
-    ## PIXEL DIMENSIONS
+    ## MAZE DIMENSIONS
     # maze is 28x31 tiles (each tile having a state as described above)
     # each tile is 3*(8x8) = 24x24 pixels
 
@@ -52,20 +52,22 @@ class Maze(Sprite):
         '0000000000000000000000000000'
     )
 
-    # Converts a pixel Vector into a tile Vector.
+    # Converts a pixel-scaled Vector into a tile-scaled Vector.
     @staticmethod
     def pixel2tile(px: Vector):
         return px/24
     
-    # Converts a tile Vector into a pixel Vector.
+    # Converts a tile-scaled Vector into a pixel-scaled Vector.
     @staticmethod
     def tile2pixel(tile: Vector):
         return tile*24
     
+    # Returns the center pixel of a tile.
     @staticmethod
     def tile2pixelctr(tile: Vector):
         return tile*24 + Vector(12, 12)
 
+    # Converts a tile vector into its position in the maze string.
     @staticmethod
     def vec2strpos(coord: Vector):
         x, y = math.floor(coord.x), math.floor(coord.y)
@@ -82,11 +84,12 @@ class Maze(Sprite):
             3: pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/power_food.png')
         }
     
+    # Returns the state of a tile. Refer to top of this class for states.
     def get_tile_state(self, vec: Vector):
         strpos = Maze.vec2strpos(vec)
         return int(self.maze[strpos])
     
-    # change tile state, set other game states
+    # Change tile state, set other game states.
     def consume_tile(self, vec: Vector):
         state = self.get_tile_state(vec)
         strpos = Maze.vec2strpos(vec)
@@ -104,7 +107,7 @@ class Maze(Sprite):
         self.maze = Maze.FRESH_MAZE
 
     def draw(self):
-        # draw maze
+        # draw maze walls
         rect = self.rect
         rect.center = self.screen.get_rect().center
         self.screen.blit(self.image, rect)
