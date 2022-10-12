@@ -54,23 +54,23 @@ class Maze(Sprite):
 
     # Converts a pixel-scaled Vector into a tile-scaled Vector.
     @staticmethod
-    def pixel2tile(px: Vector):
-        return px/24
+    def pixel2tile(px_vec: Vector):
+        return px_vec/24
     
     # Converts a tile-scaled Vector into a pixel-scaled Vector.
     @staticmethod
-    def tile2pixel(tile: Vector):
-        return tile*24
+    def tile2pixel(tile_vec: Vector):
+        return tile_vec*24
     
     # Returns the center pixel of a tile.
     @staticmethod
-    def tile2pixelctr(tile: Vector):
-        return tile*24 + Vector(12, 12)
+    def tile2pixelctr(tile_vec: Vector):
+        return tile_vec*24 + Vector(12, 12)
 
     # Converts a tile vector into its position in the maze string.
     @staticmethod
-    def vec2strpos(coord: Vector):
-        x, y = math.floor(coord.x), math.floor(coord.y)
+    def tile2strpos(tile_vec: Vector):
+        x, y = math.floor(tile_vec.x), math.floor(tile_vec.y)
         return x + 28*y
 
     def __init__(self, game):
@@ -85,14 +85,14 @@ class Maze(Sprite):
         }
     
     # Returns the state of a tile. Refer to top of this class for states.
-    def get_tile_state(self, vec: Vector):
-        strpos = Maze.vec2strpos(vec)
+    def get_tile_state(self, tile_vec: Vector):
+        strpos = Maze.tile2strpos(tile_vec)
         return int(self.maze[strpos])
     
     # Change tile state, set other game states.
-    def consume_tile(self, vec: Vector):
-        state = self.get_tile_state(vec)
-        strpos = Maze.vec2strpos(vec)
+    def consume_tile(self, tile_vec: Vector):
+        state = self.get_tile_state(tile_vec)
+        strpos = Maze.tile2strpos(tile_vec)
 
         if state == 0: # (why are we eating a wall?)
             raise ValueError('tried to consume a wall!')
