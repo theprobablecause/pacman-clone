@@ -52,10 +52,12 @@ class Maze(Sprite):
         '0000000000000000000000000000'
     )
 
+    # Converts a pixel Vector into a tile Vector.
     @staticmethod
     def pixel2tile(px: Vector):
         return px/24
     
+    # Converts a tile Vector into a pixel Vector.
     @staticmethod
     def tile2pixel(tile: Vector):
         return tile*24
@@ -66,7 +68,6 @@ class Maze(Sprite):
 
     @staticmethod
     def vec2strpos(coord: Vector):
-        x, y = math.floor(coord.x), math.floor(coord.y)
         x, y = math.floor(coord.x), math.floor(coord.y)
         return x + 28*y
 
