@@ -112,6 +112,11 @@ class Maze(Sprite):
 
     def reset(self):
         self.maze = Maze.FRESH_MAZE
+    
+    def blit_relative(self, surface: Surface, rect: pg.Rect):
+        r = rect.copy()
+        r.center = (rect.center[0] + self.rect.left, rect.center[1] + self.rect.top)
+        self.surface.blit(surface, r)
 
     def draw(self):
         # draw maze walls
@@ -123,10 +128,10 @@ class Maze(Sprite):
 
                 tile_ctr = Maze.tile2pixelctr(Vector(x, y))
 
-                if state == 2:
+                if state == 2: # food pellet
                     rect = self.food_pellet.get_rect()
-                    rect.center = (tile_ctr.x + self.rect.left, tile_ctr.y + self.rect.top)
-                    self.surface.blit(self.food_pellet, rect)
+                    rect.center = (tile_ctr.x, tile_ctr.y)
+                    self.blit_relative(self.food_pellet, rect)
                 elif state == 3:
                     pass # TODO: power pellet
 
