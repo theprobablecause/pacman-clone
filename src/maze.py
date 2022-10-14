@@ -10,10 +10,6 @@ import game as gm
 
 class Maze(Sprite):
 
-    ## MAZE DIMENSIONS
-    # maze is 28x31 tiles (each tile having a state as described above)
-    # each tile is 3*(8x8) = 24x24 pixels
-
     FRESH_MAZE = (
         '0000000000000000000000000000'
         '0222222222222002222222222220'
@@ -49,7 +45,7 @@ class Maze(Sprite):
     )
 
     WIDTH, HEIGHT = 28, 31
-    TILE_SIZE = 24 # 24x24 square
+    TILE_SIZE = 24 # 24x24px square
 
     @staticmethod
     def pixel2tile(px_vec: Vector):
@@ -96,14 +92,13 @@ class Maze(Sprite):
     def get_tile_state(self, tile_vec: Vector):
         """Returns the state of a tile.
 
-        Possible return values:\n
-        0. wall (the only non-traversable tile)
-        1. empty
-        2. food pellet
-        3. power pellet
-        4. ghost house entrance
-        5. bonus fruit
-        """
+        Possible return values:
+        0: wall (the only non-traversable tile)
+        1: empty
+        2: food pellet
+        3: power pellet
+        4: ghost house entrance
+        5: bonus fruit"""
         strpos = Maze.tile2strpos(tile_vec)
         return int(self.maze[strpos])
     

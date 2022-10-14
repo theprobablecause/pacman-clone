@@ -2,8 +2,8 @@ import os
 import pygame as pg
 
 import game_events as ge
-from play import Play
-from maze import Maze
+import play
+import maze
 
 class Game:
     RESOLUTION = (1280, 800)
@@ -19,7 +19,7 @@ class Game:
     def run(self):
         while True:
             # TODO: replace with main menu
-            p = Play(game=self)
+            p = play.Play(game=self)
             p.run()
     
     # Draw current display buffer to screen, then wait for next frame.
