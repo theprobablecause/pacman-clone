@@ -97,7 +97,7 @@ class Menu():
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if self.play_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PACMAN GAME")
-                        g = Game
+                        g = Game()
                         g.play()
                         # self.play()
                     if self.high_score_button.checkForInput(self.menu_mouse_pos):
