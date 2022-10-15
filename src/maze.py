@@ -3,21 +3,12 @@ import numpy
 import pygame as pg
 from pygame import Surface
 from pygame.sprite import Sprite
+from timer import Timer
 
 from vector import Vector
 import game as gm
 
 class Maze(Sprite):
-    ## TILE STATES
-    # 0 = wall (the only non-traversable tile)
-    # 1 = empty
-    # 2 = food pellet
-    # 3 = power pellet
-    # 4 = ghost house entrance
-
-    ## MAZE DIMENSIONS
-    # maze is 28x31 tiles (each tile having a state as described above)
-    # each tile is 3*(8x8) = 24x24 pixels
 
     FRESH_MAZE = (
         '0000000000000000000000000000'
@@ -54,50 +45,65 @@ class Maze(Sprite):
     )
 
     WIDTH, HEIGHT = 28, 31
-    TILE_SIZE = 24 # 24x24 square
+    TILE_SIZE = 24 # 24x24px square
 
-    # Converts a pixel-scaled Vector into a tile-scaled Vector.
     @staticmethod
     def pixel2tile(px_vec: Vector):
+        """Converts a pixel-scaled Vector into a tile-scaled Vector."""
         return px_vec/Maze.TILE_SIZE
     
-    # Converts a tile-scaled Vector into a pixel-scaled Vector.
     @staticmethod
     def tile2pixel(tile_vec: Vector):
+        """Converts a tile-scaled Vector into a pixel-scaled Vector."""
         return tile_vec*Maze.TILE_SIZE
     
-    # Returns the center pixel of a tile.
     @staticmethod
     def tile2pixelctr(tile_vec: Vector):
+        """Returns the center pixel of a tile."""
         return tile_vec*Maze.TILE_SIZE + Vector(12, 12)
 
-    # Converts a tile vector into its position in the maze string.
     @staticmethod
     def tile2strpos(tile_vec: Vector):
+        """Converts a tile vector into its position in the maze string."""
         x, y = math.floor(tile_vec.x), math.floor(tile_vec.y)
         return x + Maze.WIDTH*y
 
     def __init__(self, game):
         self.game = game
-        self.surface: Surface = game.screen # TODO: switch out to dedicated playfield component?
+        self.surface: Surface = game.screen
         self.maze = Maze.FRESH_MAZE
         self.image = pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
 
-        # sprites
+        # edible sprites
+        self.blank_tile = pg.surface.Surface(size=(20, 20))
+        self.blank_tile.fill((34, 34, 34))
+        self.blank_tile.set_alpha(127)
         self.food_pellet = pg.surface.Surface(size=(6, 6))
         self.food_pellet.fill((255, 183, 174))
-        # TODO
-        # self.power_pellet = pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/power_pellet.png')
+        power_sprites = [
+            pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/power_food.png'),
+            pg.surface.Surface(size=(48, 48))
+        ]
+        power_sprites[1].set_alpha(0)
+        self.power_pellet = Timer(frames=power_sprites, wait=10*1000*gm.Game.FRAME_TIME)
     
-    # Returns the state of a tile. Refer to top of this class for states.
     def get_tile_state(self, tile_vec: Vector):
+        """Returns the state of a tile.
+
+        Possible return values:
+        0: wall (the only non-traversable tile)
+        1: empty
+        2: food pellet
+        3: power pellet
+        4: ghost house entrance
+        5: bonus fruit"""
         strpos = Maze.tile2strpos(tile_vec)
         return int(self.maze[strpos])
     
-    # Change tile state, set other game states.
     def consume_tile(self, tile_vec: Vector):
+        """Change tile state at `tile_vec`, set other game states."""
         state = self.get_tile_state(tile_vec)
         strpos = Maze.tile2strpos(tile_vec)
 
@@ -112,23 +118,35 @@ class Maze(Sprite):
 
     def reset(self):
         self.maze = Maze.FRESH_MAZE
+    
+    def blit_relative(self, surface: Surface, rect: pg.Rect):
+        r = rect.copy()
+        r.center = (rect.center[0] + self.rect.left, rect.center[1] + self.rect.top)
+        self.surface.blit(surface, r)
 
     def draw(self):
-        # draw maze walls
+        """Draw maze walls, as well as remaining consumables in play."""
         self.surface.blit(self.image, self.rect)
         for y in range(Maze.HEIGHT):
             for x in range(Maze.WIDTH):
                 state = self.get_tile_state(Vector(x, y))
-                if state in [0, 1, 4]: continue # skip non-consumables
+                # if state in [0, 1, 4]: continue # skip non-consumables
+                # if state in [1, 4]: continue # ---DEBUG---
 
                 tile_ctr = Maze.tile2pixelctr(Vector(x, y))
-
-                if state == 2:
+                # if state == 0: # ---DEBUG---
+                #     rect = self.blank_tile.get_rect()
+                #     rect.center = (tile_ctr.x, tile_ctr.y)
+                #     self.blit_relative(self.blank_tile, rect)
+                if state == 2: # food pellet
                     rect = self.food_pellet.get_rect()
-                    rect.center = (tile_ctr.x + self.rect.left, tile_ctr.y + self.rect.top)
-                    self.surface.blit(self.food_pellet, rect)
+                    rect.center = (tile_ctr.x, tile_ctr.y)
+                    self.blit_relative(self.food_pellet, rect)
                 elif state == 3:
-                    pass # TODO: power pellet
+                    img:Surface = self.power_pellet.imagerect()
+                    rect = img.get_rect()
+                    rect.center = (tile_ctr.x, tile_ctr.y)
+                    self.blit_relative(img, rect)
 
     def update(self):
         self.draw()
