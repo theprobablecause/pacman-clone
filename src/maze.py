@@ -78,9 +78,9 @@ class Maze(Sprite):
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
 
         # edible sprites
-        self.blank_tile = pg.surface.Surface(size=(20, 20))
-        self.blank_tile.fill((34, 34, 34))
-        self.blank_tile.set_alpha(127)
+        self.debug_tile = pg.surface.Surface(size=(20, 20))
+        self.debug_tile.fill((34, 34, 34))
+        self.debug_tile.set_alpha(230)
         self.food_pellet = pg.surface.Surface(size=(6, 6))
         self.food_pellet.fill((255, 183, 174))
         power_sprites = [
@@ -141,9 +141,9 @@ class Maze(Sprite):
 
                 tile_ctr = Maze.tile2pixelctr(Vector(x, y))
                 # if state == 0: # ---DEBUG---
-                #     rect = self.blank_tile.get_rect()
+                #     rect = self.debug_tile.get_rect()
                 #     rect.center = (tile_ctr.x, tile_ctr.y)
-                #     self.blit_relative(self.blank_tile, rect)
+                #     self.blit_relative(self.debug_tile, rect)
                 if state == 2: # food pellet
                     rect = self.food_pellet.get_rect()
                     rect.center = (tile_ctr.x, tile_ctr.y)
