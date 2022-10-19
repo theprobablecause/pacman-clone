@@ -1,4 +1,5 @@
 def clip(value, lower, upper):
+    """Returns `value` in the bounds [`lower`, `upper`]"""
     return lower if value < lower else upper if value > upper else value
 
 def lerp(a, b, ratio):

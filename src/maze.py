@@ -4,6 +4,7 @@ import pygame as pg
 from pygame import Surface
 from pygame.sprite import Sprite
 from timer import Timer
+from util import clip
 
 from vector import Vector
 import game as gm
@@ -93,12 +94,17 @@ class Maze(Sprite):
         """Returns the state of a tile.
 
         Possible return values:
-        0: wall (the only non-traversable tile)
+        -1: out of bounds
+        0: wall (non-traversable)
         1: empty
         2: food pellet
         3: power pellet
         4: ghost house entrance
-        5: bonus fruit"""
+        5: bonus fruit
+        6: portal"""
+        if not ((0 <= tile_vec.x and tile_vec.x < Maze.WIDTH) or\
+            (0 <= tile_vec.y and tile_vec.y < Maze.HEIGHT)):
+            return -1
         strpos = Maze.tile2strpos(tile_vec)
         return int(self.maze[strpos])
     

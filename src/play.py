@@ -11,13 +11,13 @@ class Play:
         self.screen:Surface = game.screen
         self.maze = mz.Maze(game=self.game)
 
-        self.player_speed = 1
+        self.player_speed = 4
         """The player's movement speed, in tiles per second."""
 
         self.ghosts_speed = 7
         """The ghosts' movement speed, in tiles per second."""
 
-        self.test_ghost = gh.Ghost(type='reds', maze=self.maze, play=self)
+        self.test_ghost = gh.Blinky(maze=self.maze, play=self)
     
     def run(self):
         while True:
