@@ -4,6 +4,7 @@ import pygame as pg
 from pygame import Surface
 from pygame.sprite import Sprite
 from timer import Timer
+from util import clip
 
 from vector import Vector
 import game as gm
@@ -77,9 +78,9 @@ class Maze(Sprite):
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
 
         # edible sprites
-        self.blank_tile = pg.surface.Surface(size=(20, 20))
-        self.blank_tile.fill((34, 34, 34))
-        self.blank_tile.set_alpha(127)
+        self.debug_tile = pg.surface.Surface(size=(20, 20))
+        self.debug_tile.fill((34, 34, 34))
+        self.debug_tile.set_alpha(230)
         self.food_pellet = pg.surface.Surface(size=(6, 6))
         self.food_pellet.fill((255, 183, 174))
         power_sprites = [
@@ -93,12 +94,17 @@ class Maze(Sprite):
         """Returns the state of a tile.
 
         Possible return values:
-        0: wall (the only non-traversable tile)
+        -1: out of bounds
+        0: wall (non-traversable)
         1: empty
         2: food pellet
         3: power pellet
         4: ghost house entrance
-        5: bonus fruit"""
+        5: bonus fruit
+        6: portal"""
+        if not ((0 <= tile_vec.x and tile_vec.x < Maze.WIDTH) or\
+            (0 <= tile_vec.y and tile_vec.y < Maze.HEIGHT)):
+            return -1
         strpos = Maze.tile2strpos(tile_vec)
         return int(self.maze[strpos])
     
@@ -135,9 +141,9 @@ class Maze(Sprite):
 
                 tile_ctr = Maze.tile2pixelctr(Vector(x, y))
                 # if state == 0: # ---DEBUG---
-                #     rect = self.blank_tile.get_rect()
+                #     rect = self.debug_tile.get_rect()
                 #     rect.center = (tile_ctr.x, tile_ctr.y)
-                #     self.blit_relative(self.blank_tile, rect)
+                #     self.blit_relative(self.debug_tile, rect)
                 if state == 2: # food pellet
                     rect = self.food_pellet.get_rect()
                     rect.center = (tile_ctr.x, tile_ctr.y)
