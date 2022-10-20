@@ -54,7 +54,7 @@ class Ghost(Sprite):
         self.facing = ''
         """Which way the ghost is currently facing."""
 
-        self.mode = 2
+        self.mode = 1
         """The ghost's current behavior mode.
         
         Possible modes:
@@ -100,7 +100,7 @@ class Ghost(Sprite):
         self.image = self.normal_animator.imagerect()
         self.update_facing()
 
-    def update_target(self) -> None:
+    def update_chase_target(self) -> None:
         """OVERRIDE: Set the next target tile. Should only modify `self.target`!"""
         pass
 
@@ -142,7 +142,7 @@ class Ghost(Sprite):
         # print(self.facing + '\n')
     
     def update_facing(self):
-        """Update `self.facing` based on `self.tile` and `self.next_tile`."""
+        """Update `self.facing` based on `self.tile` and `self.tile_next`."""
         diff = (self.tile_next[0] - self.tile[0], self.tile_next[1] - self.tile[1])
         if diff[0] != 0: # horizontal movement
             self.facing = 'left' if diff[0] < 0 else 'right'
@@ -151,7 +151,7 @@ class Ghost(Sprite):
 
     def move(self):
         """Calculate target tile (if needed) and move towards it.
-        Updates `self.facing` and `self.next_tile`."""
+        Updates `self.facing` and `self.tile_next`."""
 
         # When next_tile is reached, update target and next_tile
         if self.tile_progress >= 1:
@@ -164,7 +164,7 @@ class Ghost(Sprite):
                 self.target = self.tile_home
             elif self.mode == 1:
                 # chase
-                self.update_target()
+                self.update_chase_target()
             elif self.mode == 3:
                 # TODO: ghost house
                 pass
@@ -225,26 +225,26 @@ class Blinky(Ghost):
     def __init__(self, maze, play):
         super().__init__(type='reds', tile_home=(25, -4), maze=maze, play=play)
     
-    def update_target(self):
+    def update_chase_target(self):
         pass
 
 class Pinky(Ghost):
     def __init__(self, maze, play):
         super().__init__(type='pinks', tile_home=(2, -4), maze=maze, play=play)
     
-    def update_target(self):
+    def update_chase_target(self):
         pass
 
 class Inky(Ghost):
     def __init__(self, maze, play):
         super().__init__(type='blues', tile_home=(27, 31), maze=maze, play=play)
     
-    def update_target(self):
+    def update_chase_target(self):
         pass
 
 class Clyde(Ghost):
     def __init__(self, maze, play):
         super().__init__(type='oranges', tile_home=(0, 31), maze=maze, play=play)
     
-    def update_target(self):
+    def update_chase_target(self):
         pass
