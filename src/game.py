@@ -1,9 +1,7 @@
 import os
 import pygame as pg
 
-import game_events as ge
 import play
-import maze
 
 class Game:
     RESOLUTION = (1280, 800)
