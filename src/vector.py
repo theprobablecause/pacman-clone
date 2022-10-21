@@ -113,6 +113,10 @@ class Vector:
     def check_dims(u, v):
         if u.dims != v.dims:
             raise ValueError('dimensions of u and v not equal')
+    
+    @staticmethod
+    def distance_squared(a, b):
+        return (a.x-b.x)**2+(a.y-b.y)**2
 
     @staticmethod
     def run_tests():

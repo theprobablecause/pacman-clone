@@ -1,7 +1,7 @@
 import pygame as pg
 import sys
 from button import Button
-from game import Game
+from play import Play
 
 class Menu():
     def __init__(self):
