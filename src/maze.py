@@ -1,3 +1,5 @@
+
+#######("NOAH KHAYAT")
 import math
 import numpy
 import pygame as pg
@@ -68,7 +70,7 @@ class Maze(Sprite):
         """Converts a tile vector into its position in the maze string."""
         x, y = math.floor(tile_vec.x), math.floor(tile_vec.y)
         return x + Maze.WIDTH*y
-
+        
     def __init__(self, game):
         self.game = game
         self.surface: Surface = game.screen
