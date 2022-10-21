@@ -12,7 +12,7 @@ class Play:
         self.screen:Surface = game.screen
         self.maze = mz.Maze(game=self.game)
 
-        self.player_speed = 4
+        self.player_speed = 7
         """The player's movement speed, in tiles per second."""
 
         self.ghosts_speed = 7

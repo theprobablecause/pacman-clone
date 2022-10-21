@@ -18,11 +18,7 @@ class Game:
         while True: 
             g = Menu()
             g.main_menu()
-
-
-
             
-    
     # Draw current display buffer to screen, then wait for next frame.
     # NOTE: Call at the end of a frame process (end of the running loop)
     def wait_next_frame(self):
