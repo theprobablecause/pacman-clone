@@ -1,3 +1,5 @@
+
+#######("NOAH KHAYAT")
 import math
 import numpy
 import pygame as pg
@@ -76,7 +78,7 @@ class Maze(Sprite):
     def tile2strpos(tile_vec: Vector):
         x, y = math.floor(tile_vec.x), math.floor(tile_vec.y)
         return x + Maze.WIDTH*y
-
+        
     def __init__(self, game):
         self.game = game
         self.surface: Surface = game.screen # TODO: switch out to dedicated playfield component?
