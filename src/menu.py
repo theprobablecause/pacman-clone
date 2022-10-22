@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 from button import Button
+from play import Play
 
 class Menu():
     def __init__(self):
@@ -96,6 +97,8 @@ class Menu():
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if self.play_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PACMAN GAME")
+                        p = Play()
+                        p.run()
                         # self.play()
                     if self.high_score_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PACMAN High Score")
@@ -105,11 +108,3 @@ class Menu():
                         sys.exit()
             pg.display.update()
             self.display_img(pacman_image)
-
-def main():
-    g = Menu()
-    g.main_menu()
-
-
-if __name__ == '__main__':
-    main()
