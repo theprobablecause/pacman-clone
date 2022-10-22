@@ -8,7 +8,7 @@ class Sound:
         pg.mixer.music.load(bg_music)
         pg.mixer.music.set_volume(0.7)
 
-        level_up_sound = pg.mixer.Sound('sounds/laser2.wav')
+        # level_up_sound = pg.mixer.Sound('sounds/ .wav')
         ghost_run_sound = pg.mixer.Sound('sounds/ pacman_intermission.wav')
         game_over_sound = pg.mixer.Sound('sounds/death.wav')
         points_sound = pg.mixer.Sound('sounds/pacman_chomp.wav')
@@ -20,7 +20,7 @@ class Sound:
     def stop_bg(self):
         pg.mixer.music.stop()
 
-    def level_up(self): pg.mixer.Sound.play(self.sounds['level_up'])
+    # def level_up(self): pg.mixer.Sound.play(self.sounds['level_up'])
 
     def play_bg(self):
         pg.mixer.music.play(-1, 0.0)
