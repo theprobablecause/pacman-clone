@@ -74,7 +74,7 @@ class Maze(Sprite):
     def __init__(self, game):
         self.game = game
         self.surface: Surface = game.screen
-        self.maze = Maze.FRESH_MAZE
+        self.maze = list(Maze.FRESH_MAZE)
         self.image = pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
@@ -110,22 +110,23 @@ class Maze(Sprite):
         strpos = Maze.tile2strpos(tile_vec)
         return int(self.maze[strpos])
     
-    def consume_tile(self, tile_vec: Vector):
+    def consume_tile(self, tile_vec: tuple[int, int]):
         """Change tile state at `tile_vec`, set other game states."""
-        state = self.get_tile_state(tile_vec)
-        strpos = Maze.tile2strpos(tile_vec)
+        vec = Vector(*tile_vec)
+        state = self.get_tile_state(vec)
+        strpos = Maze.tile2strpos(vec)
 
-        if state == 0: # (why are we eating a wall?)
-            raise ValueError('tried to consume a wall!')
+        if state in [-1, 0]: # (eating inaccessible tile)
+            pass
         elif state == 2: # food pellet
-            self.maze[strpos] = 1
+            self.maze[strpos] = '1'
             # TODO: change score, counters
         elif state == 3: # power pellet
-            self.maze[strpos] = 1
+            self.maze[strpos] = '1'
             # TODO: change score, counters, flee state
 
     def reset(self):
-        self.maze = Maze.FRESH_MAZE
+        self.maze = list(Maze.FRESH_MAZE)
     
     def blit_relative(self, surface: Surface, rect: pg.Rect):
         r = rect.copy()
