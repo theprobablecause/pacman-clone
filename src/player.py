@@ -72,12 +72,26 @@ class Player(Sprite):
     def reset(self):
         """Runs after death animation is finished."""
         # TODO: Implement reset function (for later)
+        self.maze = Maze.FRESH_MAZE
         # TODO: Set new starting tile
+        self.tile
         pass
 
     def update_tile_next(self):
         prev = self.tile_next
+
         # TODO: detect wall
+        for dir in candidate_dirs:
+            vec = DIR_VECTOR[dir]
+            check_tile = (self.tile[0]+vec[0], self.tile[1]+vec[1])
+            state = self.maze.get_tile_state(Vector(check_tile[0], check_tile[1]))
+            if state in [0, -1] or (self.mode != 3 and state == 4):
+                # skip non-traversable, and if not in eaten
+                # state, skip ghost house entrance.
+                continue
+            candidate_tiles[dir] = check_tile
+            dist[dir] = Vector.distance_squared(Vector(*check_tile), Vector(*self.target))      
+
         # TODO: set self.tile_next DEPENDING ON self.facing
         self.tile_next = (prev[0]+1, prev[1])
 
