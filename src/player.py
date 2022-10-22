@@ -12,30 +12,6 @@ import play as pl
 
 
 class Player(Sprite):
-
-#    # set the pygame window name
-#pg.display.set_caption('Pacman')
-## create a surface object, image is drawn on it.
-#pacman = {
-#    'pacman': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")],
-#}
-## Using blit to copy content from one surface to other
-#self.screen.blit(pacman, (14, 14))
-## paint screen one time
-#pygame.display.flip()
-#status = True
-#while (status):
-## iterate over the list of Event objects
-## that was returned by pygame.event.get() method.
-#	for i in pygame.event.get():
-#		# if event object type is QUIT
-#		# then quitting the pygame
-#		# and program both.
-#		if i.type == pygame.QUIT:
-#			status = False
-## deactivates the pygame library
-#pygame.quit()'''
-
     """Base class for the Player. Should not be instantiated!"""
     def __init__(self, type, tile_home, maze: mz.Maze, play):
         super().__init__()
