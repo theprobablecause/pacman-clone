@@ -1,6 +1,6 @@
 import pygame as pg
 
-
+# FUTURE SUGGESTION: name it something less confusing (like SpriteAnimator).
 class Timer:
     def __init__(self, frames, wait=100, frameindex=0, step=1,  # imagerect frames
                  looponce=False, wait_for_command=False, oscillating=False):

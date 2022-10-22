@@ -1,7 +1,7 @@
-from game import Game
+from application import Application
     
 def main():
-    g = Game()
+    g = Application()
     g.run()
 
 if __name__ == "__main__":

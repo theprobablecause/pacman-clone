@@ -7,7 +7,7 @@ from vector import Vector
 from util import *
 from timer import Timer, TimerDict, TimerDual
 import maze as mz
-import game as gm
+import application as app
 import play as pl
 
 
@@ -33,13 +33,13 @@ class Player(Sprite):
         # Reset after death
     def reset():
         global game
-        gm.ghosts = [Ghost(14.0, 13.5, "red", 0), Ghost(17.0, 11.5, "blue", 1), Ghost(17.0, 13.5, "pink", 2), Ghost(17.0, 15.5, "orange", 3)]
-        for ghost in gm.ghosts:
+        app.ghosts = [Ghost(14.0, 13.5, "red", 0), Ghost(17.0, 11.5, "blue", 1), Ghost(17.0, 13.5, "pink", 2), Ghost(17.0, 15.5, "orange", 3)]
+        for ghost in app.ghosts:
             ghost.setTarget()
-        gm.pacman = Pacman(26.0, 13.5)
-        gm.lives -= 1
-        gm.paused = True
-        gm.draw()
+        app.pacman = Pacman(26.0, 13.5)
+        app.lives -= 1
+        app.paused = True
+        app.draw()
 
 '''DIR_VECTOR = {
     'up': (0, -1),

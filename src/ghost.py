@@ -7,7 +7,7 @@ from vector import Vector
 from util import *
 from timer import Timer, TimerDict, TimerDual
 import maze as mz
-import game as gm
+import application as app
 import play as pl
 
 DIR_VECTOR = {
@@ -70,20 +70,20 @@ class Ghost(Sprite):
 
         ## SPRITES ##
         normal_sprites = {
-            'up': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_up_{x}.png") for x in range(3, 5)],
-            'down': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_down_{x}.png") for x in range(3, 5)],
-            'left': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_left_{x}.png") for x in range(3, 5)],
-            'right': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_right_{x}.png") for x in range(3, 5)]
+            'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/{type}_up_{x}.png") for x in range(3, 5)],
+            'down': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/{type}_down_{x}.png") for x in range(3, 5)],
+            'left': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/{type}_left_{x}.png") for x in range(3, 5)],
+            'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/{type}_right_{x}.png") for x in range(3, 5)]
         }
         eaten_sprites = {
-            'up': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_up.png")],
-            'down': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_down.png")],
-            'left': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_left.png")],
-            'right': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_right.png")]
+            'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_up.png")],
+            'down': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_down.png")],
+            'left': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_left.png")],
+            'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_ghosts_eyes_right.png")]
         }
         frightened_sprites = {
-            'blue': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/dead_ghosts_blue_{x}.png") for x in range(3, 5)],
-            'white': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/dead_ghosts_white_{x}.png") for x in range(3, 5)]
+            'blue': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_ghosts_blue_{x}.png") for x in range(3, 5)],
+            'white': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_ghosts_white_{x}.png") for x in range(3, 5)]
         }
         
         self.normal_animator = TimerDict(dict_frames=normal_sprites, first_key='up')
@@ -179,7 +179,7 @@ class Ghost(Sprite):
             speed = Ghost.EATEN_SPEED
         else:
             speed = self.play.ghosts_speed
-        self.tile_progress += speed*gm.Game.FRAME_TIME
+        self.tile_progress += speed*app.Application.FRAME_TIME
         # TODO: update self.rect_hitbox
     
     def flip(self):
