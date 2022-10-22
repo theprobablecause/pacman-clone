@@ -10,7 +10,62 @@ import maze as mz
 import game as gm
 import play as pl
 
-DIR_VECTOR = {
+
+class Player(Sprite):
+
+#    # set the pygame window name
+#pg.display.set_caption('Pacman')
+## create a surface object, image is drawn on it.
+#pacman = {
+#    'pacman': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")],
+#}
+## Using blit to copy content from one surface to other
+#self.screen.blit(pacman, (14, 14))
+## paint screen one time
+#pygame.display.flip()
+#status = True
+#while (status):
+## iterate over the list of Event objects
+## that was returned by pygame.event.get() method.
+#	for i in pygame.event.get():
+#		# if event object type is QUIT
+#		# then quitting the pygame
+#		# and program both.
+#		if i.type == pygame.QUIT:
+#			status = False
+## deactivates the pygame library
+#pygame.quit()'''
+
+    """Base class for the Player. Should not be instantiated!"""
+    def __init__(self, type, tile_home, maze: mz.Maze, play):
+        super().__init__()
+        self.maze = maze
+        self.play = play
+        self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+
+        self.tile = (1, 1)
+        """The ghost's last \"steady\" tile."""
+
+        self.tile_next = (2, 1)
+        """The immediate tile for the ghost to move towards. Should be adjacent to `self.tile`."""
+
+        self.tile_progress = 0
+        """PLayer's progress of movement between `self.tile`` and `self.next_tile`.
+        Should range 0 to 1 inclusive."""
+
+        # Resets Pacman after death
+        # Reset after death
+    def reset():
+        global game
+        gm.ghosts = [Ghost(14.0, 13.5, "red", 0), Ghost(17.0, 11.5, "blue", 1), Ghost(17.0, 13.5, "pink", 2), Ghost(17.0, 15.5, "orange", 3)]
+        for ghost in gm.ghosts:
+            ghost.setTarget()
+        gm.pacman = Pacman(26.0, 13.5)
+        gm.lives -= 1
+        gm.paused = True
+        gm.draw()
+
+'''DIR_VECTOR = {
     'up': (0, -1),
     'left': (-1, 0),
     'down': (0, 1),
@@ -115,7 +170,7 @@ class Player(Sprite):
             self.facing = 'down' if diff[1] > 0 else 'up'
 
     # Calling method from maze to consume tile once destination tile is reached
-    maze.consume_tile()
+    maze.consume_tile()'''
 
 """ import pygame
 from pygame.sprite import Sprite
