@@ -9,7 +9,7 @@ from timer import Timer
 from util import clip
 
 from vector import Vector
-import game as gm
+import application as app
 
 class Maze(Sprite):
 
@@ -75,7 +75,7 @@ class Maze(Sprite):
         self.game = game
         self.surface: Surface = game.screen
         self.maze = Maze.FRESH_MAZE
-        self.image = pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/maze.png')
+        self.image = pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
 
@@ -86,11 +86,11 @@ class Maze(Sprite):
         self.food_pellet = pg.surface.Surface(size=(6, 6))
         self.food_pellet.fill((255, 183, 174))
         power_sprites = [
-            pg.image.load(gm.Game.PROJECT_DIR + '/resources/sprites/power_food.png'),
+            pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/power_food.png'),
             pg.surface.Surface(size=(48, 48))
         ]
         power_sprites[1].set_alpha(0)
-        self.power_pellet = Timer(frames=power_sprites, wait=10*1000*gm.Game.FRAME_TIME)
+        self.power_pellet = Timer(frames=power_sprites, wait=10*1000*app.Application.FRAME_TIME)
     
     def get_tile_state(self, tile_vec: Vector):
         """Returns the state of a tile.
