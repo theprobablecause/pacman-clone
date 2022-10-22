@@ -82,26 +82,15 @@ class Menu():
                     sys.exit()
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if self.play_button.checkForInput(self.menu_mouse_pos):
-<<<<<<< HEAD
-                        pg.display.set_caption("PACMAN GAME")
-                        p = Play()
-                        p.play()
-                        # self.play()
-=======
                         pg.display.set_caption("PAC MAN")
                         p = Play(game=self.game)
                         p.run()
->>>>>>> 8bb6d56b66554cc9a83e91c36f2feba6a593596d
                     if self.high_score_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PACMAN High Score")
                         self.high_score_screen()
                     if self.quit_button.checkForInput(self.menu_mouse_pos):
                         pg.quit()
                         sys.exit()
-<<<<<<< HEAD
-            pg.display.update()
-            self.display_img(pacman_image)
-=======
             
             for button in [self.play_button, self.high_score_button, self.quit_button]:
                 button.changeColor(self.menu_mouse_pos)
@@ -111,4 +100,3 @@ class Menu():
             self.draw_anim_frame()
             self.game.wait_next_frame()
 
->>>>>>> 8bb6d56b66554cc9a83e91c36f2feba6a593596d
