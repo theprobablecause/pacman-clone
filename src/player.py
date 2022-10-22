@@ -1,83 +1,111 @@
-import pygame
+import random
+import pygame as pg
 from pygame.sprite import Sprite
 
+from vector import Vector
 
-class Character(Sprite):
-    def __init__(self, sheet_location, pos, screen, map):
-        super(Character, self).__init__()
-        self.sheet = pygame.image.load(sheet_location).convert_alpha()
-        self.pos = pos
-        self.rect = pygame.Rect(pos[0], pos[1], 28, 28)
-        self.velocity = (1, 0)
-        self.old_velocity = (0, 0)
-        self.still_wall = False
-        self.screen = screen
-        self.speed_counter = 0
-        self.map = map
+from util import *
+from timer import Timer, TimerDict, TimerDual
+import maze as mz
+import application as app
+import play as pl
 
-    def strip_from_sheet(self, start, size, columns, rows):
-        frames = []
-        for j in range(rows):
-            for i in range(columns):
-                location = (start[0] + size[0] * i, start[1] + size[1] * j)
-                frames.append(self.sheet.subsurface(pygame.Rect(location, size)))
-        return frames
+ 
+class Player(Sprite):
+    """Class for the Player, handling Pac Man's controls, movement, and other operations."""
+    DIR_VECTOR = {
+        'up': (0, -1),
+        'left': (-1, 0),
+        'down': (0, 1),
+        'right': (1, 0)
+    }
 
-    def set_image(self, image):
-        self.image = image
+    def __init__(self, maze: mz.Maze, play):
+        super().__init__()
+        self.maze = maze
+        self.play = play
+        self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
 
-    def change_direction(self, direction, pacman_timer):
-        if direction == 'r':
-            self.velocity = (1, 0)
-        elif direction == 'l':
-            self.velocity = (-1, 0)
-        elif direction == 'u':
-            self.velocity = (0, -1)
-        elif direction == 'd':
-            self.velocity = (0, 1)
-        pacman_timer.frameindex = 0
+        player_sprites = {
+            'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in range(1, 3)],
+            'down': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_down_{x}.png") for x in range(1, 3)],
+            'left': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_left_{x}.png") for x in range(1, 3)],
+            'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_right_{x}.png") for x in range(1, 3)]
+        }
 
-    def blitme(self):
-        self.screen.blit(self.image, self.rect)
+        player_all_closed_sprite = pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")
 
-    def update_movement(self, collision):
-        if self.speed_counter == 3:
-            # print(self.map_pos)
-            # if self.velocity == (1, 0) and self.map[self.map_pos[0]][self.map_pos[1] + 1] == 'x':
-            #     self.velocity = (0, 0)
-            # elif self.velocity == (-1, 0) and self.map[self.map_pos[0]][self.map_pos[1] - 1] == 'x':
-            #     self.velocity = (0, 0)
-            # elif self.velocity == (0, 1) and self.map[self.map_pos[0] - 1][self.map_pos[1]] == 'x':
-            #     self.velocity = (0, 0)
-            # elif self.velocity == (0, -1) and self.map[self.map_pos[0] + 1][self.map_pos[1]] == 'x':
-            #     self.velocity = (0, 0)
-            #
-            # if self.rect.x >= self.next_pos[0]:
-            #     self.map_pos = (self.map_pos[0], self.map_pos[1] + 1)
-            #     self.next_pos = (self.rect.centerx + 34, self.rect.centery + 34)
-            # elif self.rect.x <= self.next_pos[0] - 68:
-            #     self.map_pos = (self.map_pos[0], self.map_pos[1] - 1)
-            #     self.next_pos = (self.rect.centerx + 34, self.rect.centery + 34)
-            # elif self.rect.y >= self.next_pos[1]:
-            #     self.map_pos = (self.map_pos[0] - 1, self.map_pos[1])
-            #     self.next_pos = (self.rect.centerx + 34, self.rect.centery + 34)
-            # elif self.rect.y <= self.next_pos[1] - 68:
-            #     self.map_pos = (self.map_pos[0] + 1, self.map_pos[1])
-            #     self.next_pos = (self.rect.centerx + 34, self.rect.centery + 34)
-            if collision is None:
-                self.still_wall = False
-                self.rect.x += self.velocity[0]
-                self.rect.y += self.velocity[1]
-            else:
-                if self.still_wall:
-                    self.rect.x -= self.old_velocity[0]
-                    self.rect.y -= self.old_velocity[1]
-                else:
-                    self.rect.x -= self.velocity[0]
-                    self.rect.y -= self.velocity[1]
-                self.old_velocity = self.velocity
-                self.still_wall = True
-                self.velocity = (0, 0)
-            self.speed_counter = 0
-        else:
-            self.speed
+        for v in player_sprites.values():
+            v.insert(0, player_all_closed_sprite)
+
+        self.pacman_animator = TimerDict(dict_frames=player_sprites, first_key='up')
+        """The sprite animation handler."""
+
+        self.lives = 3
+        """The player's remaining lives."""
+
+        self.tile = (1, 1)
+        """The player's last \"steady\" tile."""
+
+        self.tile_next = (2, 1)
+        """The immediate tile for the player to move towards. Should be adjacent to `self.tile`."""
+
+        self.tile_progress = 0
+        """Player's progress of movement between `self.tile`` and `self.next_tile`.
+        Should range 0 to 1 inclusive."""
+
+        self.facing = ''
+        self.update_facing()
+
+    def on_hit(self):
+        self.lives -= 1
+
+    def update_facing(self):
+        """Update `self.facing` based on `self.tile` and `self.tile_next`."""
+        diff = (self.tile_next[0] - self.tile[0], self.tile_next[1] - self.tile[1])
+        if diff == (0,0): return
+        if diff[0] != 0: # horizontal movement
+            self.facing = 'left' if diff[0] < 0 else 'right'
+        else: # vertical movement
+            self.facing = 'down' if diff[1] > 0 else 'up'
+    
+    def reset(self):
+        """Runs after death animation is finished."""
+        # TODO: Implement reset function (for later)
+        # TODO: Set new starting tile
+        pass
+
+    def update_tile_next(self):
+        prev = self.tile_next
+        # TODO: detect wall
+        # TODO: set self.tile_next DEPENDING ON self.facing
+        self.tile_next = (prev[0]+1, prev[1])
+
+    def move(self):
+        self.tile_progress += self.play.player_speed*app.Application.FRAME_TIME
+        if self.tile_progress >= 1:
+            self.maze.consume_tile(self.tile)
+            self.tile_progress %= 1
+            self.tile = [self.tile_next[0], self.tile_next[1]]
+            self.maze.consume_tile(self.tile)
+            self.update_tile_next()
+            self.update_facing()
+
+    def draw(self):
+        self.pacman_animator.key = self.facing
+        img = self.pacman_animator.imagerect()
+        # coordinates
+        current_tile = Vector(
+            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+        )
+        px = mz.Maze.tile2pixelctr(current_tile)
+        r = img.get_rect()
+        r.center = (px.x, px.y)
+        self.maze.blit_relative(img, r)
+
+    def update(self):
+        self.move()
+        self.draw()
+
+
