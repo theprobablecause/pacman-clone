@@ -90,7 +90,6 @@ class Player(Sprite):
             self.maze.consume_tile(self.tile)
             self.update_tile_next()
             self.update_facing()
-        print(self.tile_progress)
 
     def draw(self):
         self.pacman_animator.key = self.facing

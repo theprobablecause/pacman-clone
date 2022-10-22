@@ -29,29 +29,33 @@ class Ghost(Sprite):
     FRIGHTENED_SPEED = 3
     EATEN_SPEED = 20
 
-    def __init__(self, type, tile_home, maze: mz.Maze, play):
+    def __init__(self, type, tile_start, tile_scatter, maze: mz.Maze, pacman, play):
         super().__init__()
+        self.pacman = pacman
         self.maze = maze
         self.play = play
         self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+        
+        self.tile_start = tile_start
+        """The tile to spawn on at the very beginning of a game."""
 
-        self.tile = (1, 1)
+        self.tile = tile_start
         """The ghost's last \"steady\" tile."""
 
         self.tile_next = (2, 1)
         """The immediate tile for the ghost to move towards. Should be adjacent to `self.tile`."""
 
-        self.tile_home = tile_home
+        self.tile_scatter = tile_scatter
         """The tile that the ghost will target during scatter mode."""
 
-        self.target = tile_home
+        self.target = tile_scatter
         """The tile that the ghost will ultimately be working towards."""
 
-        self.tile_progress = 0
+        self.tile_progress = 1
         """Ghost's progress of movement between `self.tile`` and `self.next_tile`.
         Should range 0 to 1 inclusive."""
 
-        self.facing = ''
+        self.facing = 'right'
         """Which way the ghost is currently facing."""
 
         self.mode = 1
@@ -98,6 +102,7 @@ class Ghost(Sprite):
         """The sprite animation handler for eaten mode."""
 
         self.image = self.normal_animator.imagerect()
+        self.update_next_tile()
         self.update_facing()
 
     def update_chase_target(self) -> None:
@@ -161,7 +166,7 @@ class Ghost(Sprite):
             # determine target
             if self.mode == 0:
                 # scatter
-                self.target = self.tile_home
+                self.target = self.tile_scatter
             elif self.mode == 1:
                 # chase
                 self.update_chase_target()
@@ -222,29 +227,29 @@ class Ghost(Sprite):
         self.draw()
 
 class Blinky(Ghost):
-    def __init__(self, maze, play):
-        super().__init__(type='reds', tile_home=(25, -4), maze=maze, play=play)
+    def __init__(self, maze, pacman, play):
+        super().__init__(type='reds', tile_start=(18, 10), tile_scatter=(25, -4), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        self.target = self.pacman.tile
 
 class Pinky(Ghost):
-    def __init__(self, maze, play):
-        super().__init__(type='pinks', tile_home=(2, -4), maze=maze, play=play)
+    def __init__(self, maze, pacman, play):
+        super().__init__(type='pinks', tile_start=(8, 11), tile_scatter=(2, -4), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
         pass
 
 class Inky(Ghost):
-    def __init__(self, maze, play):
-        super().__init__(type='blues', tile_home=(27, 31), maze=maze, play=play)
+    def __init__(self, maze, pacman, play):
+        super().__init__(type='blues', tile_start=(18, 14), tile_scatter=(27, 31), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
         pass
 
 class Clyde(Ghost):
-    def __init__(self, maze, play):
-        super().__init__(type='oranges', tile_home=(0, 31), maze=maze, play=play)
+    def __init__(self, maze, pacman, play):
+        super().__init__(type='oranges', tile_start=(9, 14), tile_scatter=(0, 31), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
         pass

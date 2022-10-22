@@ -19,14 +19,14 @@ class Play:
         self.ghosts_speed = 7
         """The ghosts' movement speed, in tiles per second."""
 
-        self.ghosts = pg.sprite.Group(
-            gh.Blinky(maze=self.maze, play=self),
-            gh.Inky(maze=self.maze, play=self),
-            gh.Pinky(maze=self.maze, play=self),
-            gh.Clyde(maze=self.maze, play=self)
-        )
-
         self.player = player.Player(maze=self.maze, play=self)
+
+        self.ghosts = pg.sprite.Group(
+            gh.Blinky(maze=self.maze, pacman=self.player, play=self),
+            gh.Inky(maze=self.maze, pacman=self.player, play=self),
+            gh.Pinky(maze=self.maze, pacman=self.player, play=self),
+            gh.Clyde(maze=self.maze, pacman=self.player, play=self)
+        )
 
     def run(self):
         while True:
