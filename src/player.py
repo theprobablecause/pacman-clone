@@ -20,27 +20,20 @@ class Player(Sprite):
         'right': (1, 0)
     }
 
-    OPPOSITE_DIR = {
-        'up': 'down',
-        'left': 'right',
-        'down': 'up',
-        'right': 'left'
-    }
-
     def __init__(self, maze: mz.Maze, play):
         super().__init__()
         self.maze = maze
         self.play = play
         self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
-        
+
         player_sprites = {
-            'up': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in range(1, 3)],
-            'down': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_down_{x}.png") for x in range(1, 3)],
-            'left': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_left_{x}.png") for x in range(1, 3)],
-            'right': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_right_{x}.png") for x in range(1, 3)]
+            'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in range(1, 3)],
+            'down': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_down_{x}.png") for x in range(1, 3)],
+            'left': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_left_{x}.png") for x in range(1, 3)],
+            'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_right_{x}.png") for x in range(1, 3)]
         }
 
-        player_all_closed_sprite = pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")
+        player_all_closed_sprite = pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")
 
         for v in player_sprites.values():
             v.insert(0, player_all_closed_sprite)
@@ -61,11 +54,20 @@ class Player(Sprite):
         """Player's progress of movement between `self.tile`` and `self.next_tile`.
         Should range 0 to 1 inclusive."""
 
-        # Resets Pacman after death
-        # Reset after death
+        self.facing = ''
+        self.update_facing()
 
     def on_hit(self):
         self.lives -= 1
+
+    def update_facing(self):
+        """Update `self.facing` based on `self.tile` and `self.tile_next`."""
+        diff = (self.tile_next[0] - self.tile[0], self.tile_next[1] - self.tile[1])
+        if diff == (0,0): return
+        if diff[0] != 0: # horizontal movement
+            self.facing = 'left' if diff[0] < 0 else 'right'
+        else: # vertical movement
+            self.facing = 'down' if diff[1] > 0 else 'up'
     
     def reset(self):
         """Runs after death animation is finished."""
@@ -73,12 +75,36 @@ class Player(Sprite):
         # TODO: Set new starting tile
         pass
 
+    def update_tile_next(self):
+        prev = self.tile_next
+        # TODO: detect wall
+        # TODO: set self.tile_next DEPENDING ON self.facing
+        self.tile_next = (prev[0]+1, prev[1])
+
+    def move(self):
+        self.tile_progress += self.play.player_speed*app.Application.FRAME_TIME
+        if self.tile_progress >= 1:
+            self.tile_progress %= 1
+            self.tile = [self.tile_next[0], self.tile_next[1]]
+            self.update_tile_next()
+            self.update_facing()
+        print(self.tile_progress)
+
     def draw(self):
+        self.pacman_animator.key = self.facing
         img = self.pacman_animator.imagerect()
-        rect = img.get_rect()
-        self.maze.blit_relative(img, rect)
+        # coordinates
+        current_tile = Vector(
+            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+        )
+        px = mz.Maze.tile2pixelctr(current_tile)
+        r = img.get_rect()
+        r.center = (px.x, px.y)
+        self.maze.blit_relative(img, r)
 
     def update(self):
+        self.move()
         self.draw()
 
 
