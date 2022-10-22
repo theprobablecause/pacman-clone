@@ -14,7 +14,7 @@ class Sound:
         points_sound = pg.mixer.Sound('sounds/pacman_chomp.wav')
         power_pill_sound = pg.mixer.Sound('sounds/pill_sound.wav')
         pacman_eat_ghost = pg.mixer.Sound('sounds/pacman_eatghost.wav')
-        self.sounds = {'level_up': level_up_sound, 'ghost_run': ghost_run_sound, 'game_over': game_over_sound,
+        self.sounds = {'ghost_run': ghost_run_sound, 'game_over': game_over_sound,
                        'points': points_sound, 'power': power_pill_sound, 'eat_ghost': pacman_eat_ghost}
 
     def stop_bg(self):
