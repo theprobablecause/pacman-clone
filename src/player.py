@@ -1,6 +1,124 @@
-import pygame
+import random
+import pygame as pg
 from pygame.sprite import Sprite
 
+from vector import Vector
+
+from util import *
+from timer import Timer, TimerDict, TimerDual
+import maze as mz
+import game as gm
+import play as pl
+
+DIR_VECTOR = {
+    'up': (0, -1),
+    'left': (-1, 0),
+    'down': (0, 1),
+    'right': (1, 0)
+}
+
+OPPOSITE_DIR = {
+    'up': 'down',
+    'left': 'right',
+    'down': 'up',
+    'right': 'left'
+}
+
+class Player(Sprite):
+    """Base class for the Player. Should not be instantiated!"""
+    # Draws Pacman
+    self.pacman.draw()
+    pygame.display.update()
+
+    def __init__(self, type, tile_home, maze: mz.Maze, play):
+        super().__init__()
+        self.maze = maze
+        self.play = play
+        self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+
+        self.tile = (1, 1)
+        """The ghost's last \"steady\" tile."""
+
+        self.tile_next = (2, 1)
+        """The immediate tile for the ghost to move towards. Should be adjacent to `self.tile`."""
+
+        self.tile_progress = 0
+        """PLayer's progress of movement between `self.tile`` and `self.next_tile`.
+        Should range 0 to 1 inclusive."""
+
+        # Resets Pacman after death
+        # Reset after death
+    def reset():
+        global game
+        game.ghosts = [Ghost(14.0, 13.5, "red", 0), Ghost(17.0, 11.5, "blue", 1), Ghost(17.0, 13.5, "pink", 2), Ghost(17.0, 15.5, "orange", 3)]
+        for ghost in game.ghosts:
+            ghost.setTarget()
+        game.pacman = Pacman(26.0, 13.5)
+        game.lives -= 1
+        game.paused = True
+        game.draw()
+
+        ## SPRITES ##
+        normal_sprites = {
+            'up': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_up_{x}.png") for x in range(3, 5)],
+            'down': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_down_{x}.png") for x in range(3, 5)],
+            'left': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_left_{x}.png") for x in range(3, 5)],
+            'right': [pg.image.load(f"{gm.Game.PROJECT_DIR}/resources/sprites/{type}_right_{x}.png") for x in range(3, 5)]
+        }
+
+        self.image = self.normal_animator.imagerect()
+        self.update_facing()
+
+        # If Pacman hits a wall, continuous movement will stop
+        def checkInput(p):
+            global joyin, joystick_count
+            xaxis = yaxis = 0
+            if joystick_count > 0:
+                xaxis = joyin.get_axis(0)
+                yaxis = joyin.get_axis(1)
+            if key.get_pressed()[K_LEFT] or xaxis < -0.8:
+                p.angle = 180
+                p.movex = -20
+            if key.get_pressed()[K_RIGHT] or xaxis > 0.8:
+                p.angle = 0
+                p.movex = 20
+            if key.get_pressed()[K_UP] or yaxis < -0.8:
+                p.angle = 90
+                p.movey = -20
+            if key.get_pressed()[K_DOWN] or yaxis > 0.8:
+                p.angle = 270
+                p.movey = 20
+
+        # inside update() function
+
+            if player.movex or player.movey:
+                inputLock()
+                animate(player, pos=(player.x + player.movex, player.y + player.movey), duration=1/SPEED, tween='linear', on_finished=inputUnLock)
+
+        # outside update() function
+
+        def inputLock():
+            global player
+            player.inputActive = False
+
+        def inputUnLock():
+            global player
+            player.movex = player.movey = 0
+            player.inputActive = True
+
+    def update_facing(self):
+        """Update `self.facing` based on `self.tile` and `self.tile_next`."""
+        diff = (self.tile_next[0] - self.tile[0], self.tile_next[1] - self.tile[1])
+        if diff[0] != 0: # horizontal movement
+            self.facing = 'left' if diff[0] < 0 else 'right'
+        else: # vertical movement
+            self.facing = 'down' if diff[1] > 0 else 'up'
+
+    # Calling method from maze to consume tile once destination tile is reached
+    maze.consume_tile()
+
+""" import pygame
+from pygame.sprite import Sprite
 
 class Character(Sprite):
     def __init__(self, sheet_location, pos, screen, map):
@@ -80,4 +198,4 @@ class Character(Sprite):
                 self.velocity = (0, 0)
             self.speed_counter = 0
         else:
-            self.speed
+            self.speed """
