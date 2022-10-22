@@ -5,6 +5,7 @@ from pygame.surface import Surface
 import game_events as ge
 import maze as mz
 import ghost as gh
+import player
 
 class Play:
     def __init__(self, game):
@@ -25,10 +26,13 @@ class Play:
             gh.Clyde(maze=self.maze, play=self)
         )
 
+        self.player = player.Player(maze=self.maze, play=self)
+
     def run(self):
         while True:
             self.screen.fill((0, 0, 0))
             ge.process_events(self)
             self.maze.update()
             self.ghosts.update()
+            self.player.update()
             self.game.wait_next_frame()
