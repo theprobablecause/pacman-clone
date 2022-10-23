@@ -98,6 +98,13 @@ class Player(Sprite):
             self.facing = 'left' if diff[0] < 0 else 'right'
         else: # vertical movement
             self.facing = 'down' if diff[1] > 0 else 'up'
+        
+    def teleport(self, tile: tuple[int, int]):
+        """Teleport Pac Man to a particular tile."""
+        self.tile = tile
+        self.tile_next = tile
+        self.tile_next = self.get_facing_tile()
+        self.tile_progress = 0
     
     def reset(self):
         """Runs after death animation is finished."""
