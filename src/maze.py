@@ -71,9 +71,9 @@ class Maze(Sprite):
         x, y = math.floor(tile_vec.x), math.floor(tile_vec.y)
         return x + Maze.WIDTH*y
         
-    def __init__(self, game):
-        self.game = game
-        self.surface: Surface = game.screen
+    def __init__(self, play):
+        self.play = play
+        self.surface: Surface = play.screen
         self.maze = list(Maze.FRESH_MAZE)
         self.image = pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
@@ -118,11 +118,19 @@ class Maze(Sprite):
 
         if state in [-1, 0]: # (eating inaccessible tile)
             pass
+        elif state == 1: # blank tile
+            self.play.sound.stop_chomping()
+            pass
         elif state == 2: # food pellet
             self.maze[strpos] = '1'
+            self.play.sound.start_chomping()
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
+            for ghost in self.play.ghosts:
+                ghost.set_mode(2)
+                self.play.play_state.power_pellet_eatened()
+                self.play.sound.music_power_pellet()
             # TODO: change score, counters, flee state
 
     def reset(self):
@@ -158,4 +166,4 @@ class Maze(Sprite):
                     self.blit_relative(img, rect)
 
     def update(self):
-        self.draw()
+        pass

@@ -34,7 +34,7 @@ class Ghost(Sprite):
         self.pacman = pacman
         self.maze = maze
         self.play = play
-        self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
         
         self.tile_start = tile_start
         """The tile to spawn on at the very beginning of a game."""
@@ -58,7 +58,7 @@ class Ghost(Sprite):
         self.facing = 'right'
         """Which way the ghost is currently facing."""
 
-        self.mode = 1
+        self.mode = 0
         """The ghost's current behavior mode.
         
         Possible modes:
@@ -104,6 +104,11 @@ class Ghost(Sprite):
         self.image = self.normal_animator.imagerect()
         self.update_next_tile()
         self.update_facing()
+
+    def set_mode(self, mode):
+        if self.mode != 3:
+            self.mode = mode
+            self.flip()
 
     def update_chase_target(self) -> None:
         """OVERRIDE: Set the next target tile. Should only modify `self.target`!"""
@@ -185,11 +190,21 @@ class Ghost(Sprite):
         else:
             speed = self.play.ghosts_speed
         self.tile_progress += speed*app.Application.FRAME_TIME
-        # TODO: update self.rect_hitbox
+        
+        current_tile = Vector(
+            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+        )
+        px = mz.Maze.tile2pixelctr(current_tile)
+        self.rect.center = (px.x, px.y)
     
     def flip(self):
         """Flip our movement completely."""
-        pass
+        self.facing = OPPOSITE_DIR[self.facing]
+        self.tile_temp = self.tile_next
+        self.tile_next = self.tile
+        self.tile = self.tile_temp
+        self.tile_progress = 1 - self.tile_progress
 
     def draw(self):
         # coordinates
@@ -211,20 +226,20 @@ class Ghost(Sprite):
             self.normal_animator.key = self.facing
             self.image = self.normal_animator.imagerect()
 
+        # coordinates
         r = self.image.get_rect()
-        r.center = (px.x, px.y)
+        r.center = self.rect.center
         self.maze.blit_relative(self.image, r)
 
         # DEBUG: draw current target
-        # target_vec = mz.Maze.tile2pixelctr(Vector(*self.target))
-        # target_pt = (target_vec.x, target_vec.y)
-        # target_rect = pg.Rect((0, 0), (24, 24))
-        # target_rect.center = target_pt
-        # self.maze.blit_relative(self.debug_draw_rect, target_rect)
+        target_vec = mz.Maze.tile2pixelctr(Vector(*self.target))
+        target_pt = (target_vec.x, target_vec.y)
+        target_rect = pg.Rect((0, 0), (24, 24))
+        target_rect.center = target_pt
+        self.maze.blit_relative(self.debug_draw_rect, target_rect)
 
     def update(self):
         self.move()
-        self.draw()
 
 class Blinky(Ghost):
     def __init__(self, maze, pacman, play):
@@ -238,7 +253,11 @@ class Pinky(Ghost):
         super().__init__(type='pinks', tile_start=(8, 11), tile_scatter=(2, -4), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        vec_facing = DIR_VECTOR[self.pacman.facing]
+        tile_pac = list(self.pacman.tile)
+        for i in range(2):
+            tile_pac[i] += 4*vec_facing[i]
+        self.target = tuple(tile_pac)
 
 class Inky(Ghost):
     def __init__(self, maze, pacman, play):

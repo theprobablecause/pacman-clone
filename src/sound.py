@@ -2,45 +2,59 @@ import pygame as pg
 import application as app
 import time
 
+import application as app
 
 class Sound:
-    def __init__(self, bg_music):
+    def __init__(self):
         pg.mixer.init()
-        pg.mixer.music.load(bg_music)
-        pg.mixer.music.set_volume(0.7)
 
-        # level_up_sound = pg.mixer.Sound('sounds/ .wav')
-        ghost_run_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_intermission.wav')
-        game_over_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_death.wav')
-        points_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_chomp.wav')
-        power_pill_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/sounds/pill_sound.wav')
-        pacman_eat_ghost = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_eatghost.wav')
-        self.sounds = {'ghost_run': ghost_run_sound, 'game_over': game_over_sound,
-                       'points': points_sound, 'power': power_pill_sound, 'eat_ghost': pacman_eat_ghost}
-        
+        self.chomp_channel = pg.mixer.find_channel()
 
-    def stop_bg(self):
+        soud_game_over = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_death.wav')
+        sound_chomp = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_chomp.wav')
+        sound_power_pellet = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav')
+        sound_eat_ghost = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_eatghost.wav')
+        self.sfx = {
+            'game_over': soud_game_over,
+            'chomp': sound_chomp,
+            'power_pellet': sound_power_pellet,
+            'eat_ghost': sound_eat_ghost
+        }
+
+        self.siren = [f'{app.Application.PROJECT_DIR}/resources/sounds/siren_{x}.wav' for x in range (1,6)]
+        self.audio_power_pellet = f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav'
+
+        pg.mixer.music.set_volume(0.35)
+        self.chomp_channel.set_volume(0.5)
+        self.music_normal()
+
+    def music_stop(self):
         pg.mixer.music.stop()
 
-    # def level_up(self): pg.mixer.Sound.play(self.sounds['level_up'])
-
-    def play_bg(self):
+    def music_normal(self):
+        self.music_stop()
+        pg.mixer.music.load(self.siren[0])
         pg.mixer.music.play(-1, 0.0)
 
-    def ghost_run(self):
-        pg.mixer.Sound.play(self.sounds['ghost_run'])
+    def music_power_pellet(self):
+        self.music_stop()
+        pg.mixer.music.load(self.audio_power_pellet)
+        pg.mixer.music.play(loops=-1)
 
-    def points(self):
-        pg.mixer.Sound.play(self.sounds['points'])
-
-    def power_up(self):
-        pg.mixer.Sound.play(self.sounds['power'])
+    def start_chomping(self):
+        if not self.chomp_channel.get_busy():
+            self.chomp_channel.play(self.sfx['chomp'], loops=-1)
+    
+    def stop_chomping(self):
+        self.chomp_channel.stop()
 
     def eat_ghost(self):
-        pg.mixer.Sound.play(self.sounds['eat_ghost'])
+        pg.mixer.Sound.play(self.sfx['eat_ghost'])
 
     def game_over(self):
-        self.stop_bg()
-        pg.mixer.music.load('sounds/death.wav')
-        self.play_bg()
+        self.music_stop()
+        pg.mixer.Sound.play(self.sfx['game_over'])
         time.sleep(2.8)
+    
+    def update(self):
+        pass

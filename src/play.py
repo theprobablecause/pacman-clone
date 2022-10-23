@@ -5,13 +5,20 @@ from pygame.surface import Surface
 import game_events as ge
 import maze as mz
 import ghost as gh
+from play_state import PlayState
 import player
+from sound import Sound
+import scoreboard as sb
 
 class Play:
-    def __init__(self, game):
-        self.game = game
-        self.screen:Surface = game.screen
-        self.maze = mz.Maze(game=self.game)
+    def __init__(self, app):
+        self.app = app
+        self.screen:Surface = app.screen
+        self.scoreboard = sb.Scoreboard(play=self)
+        self.maze = mz.Maze(play=self)
+        self.play_state = PlayState(play=self)
+
+        self.sound = Sound()
 
         self.player_speed = 7
         """The player's movement speed, in tiles per second."""
@@ -28,11 +35,29 @@ class Play:
             gh.Clyde(maze=self.maze, pacman=self.player, play=self)
         )
 
+    def set_ghosts_mode(self, mode):
+        for g in self.ghosts:
+            g.set_mode(mode)
+
+    def collision_check(self):
+        # cols = self.player.coll
+        pass
+
     def run(self):
+        self.sound.music_normal()
         while True:
             self.screen.fill((0, 0, 0))
             ge.process_events(self)
-            self.maze.update()
+            self.play_state.update()
+
             self.ghosts.update()
             self.player.update()
-            self.game.wait_next_frame()
+            self.collision_check()
+
+            self.maze.draw()
+            for g in self.ghosts:
+                g.draw()
+            self.player.draw()
+            self.scoreboard.update()
+
+            self.app.wait_next_frame()

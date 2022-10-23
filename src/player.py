@@ -24,7 +24,7 @@ class Player(Sprite):
         super().__init__()
         self.maze = maze
         self.play = play
-        self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
 
         player_sprites = {
             'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in [1, 2, 1]],
@@ -56,6 +56,7 @@ class Player(Sprite):
 
         self.facing = ''
         self.update_facing()
+        self.maze.consume_tile(self.tile)
 
     def on_hit(self):
         self.lives -= 1
@@ -97,28 +98,28 @@ class Player(Sprite):
     def move(self):
         self.tile_progress += self.play.player_speed*app.Application.FRAME_TIME
         if self.tile_progress >= 1:
-            self.maze.consume_tile(self.tile)
             self.tile_progress %= 1
             self.tile = [self.tile_next[0], self.tile_next[1]]
             self.maze.consume_tile(self.tile)
             self.update_tile_next()
             self.update_facing()
 
-    def draw(self):
-        self.pacman_animator.key = self.facing
-        img = self.pacman_animator.imagerect()
-        # coordinates
         current_tile = Vector(
             lerp(self.tile[0], self.tile_next[0], self.tile_progress),
             lerp(self.tile[1], self.tile_next[1], self.tile_progress)
         )
         px = mz.Maze.tile2pixelctr(current_tile)
+        self.rect.center = (px.x, px.y)
+
+    def draw(self):
+        self.pacman_animator.key = self.facing
+        img = self.pacman_animator.imagerect()
+        # coordinates
         r = img.get_rect()
-        r.center = (px.x, px.y)
+        r.center = self.rect.center
         self.maze.blit_relative(img, r)
 
     def update(self):
         self.move()
-        self.draw()
 
 
