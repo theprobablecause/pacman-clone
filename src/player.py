@@ -27,10 +27,10 @@ class Player(Sprite):
         self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
 
         player_sprites = {
-            'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in range(1, 3)],
-            'down': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_down_{x}.png") for x in range(1, 3)],
-            'left': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_left_{x}.png") for x in range(1, 3)],
-            'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_right_{x}.png") for x in range(1, 3)]
+            'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in [1, 2, 1]],
+            'down': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_down_{x}.png") for x in [1, 2, 1]],
+            'left': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_left_{x}.png") for x in [1, 2, 1]],
+            'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_right_{x}.png") for x in [1, 2, 1]]
         }
 
         player_all_closed_sprite = pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")
@@ -38,7 +38,7 @@ class Player(Sprite):
         for v in player_sprites.values():
             v.insert(0, player_all_closed_sprite)
 
-        self.pacman_animator = TimerDict(dict_frames=player_sprites, first_key='up')
+        self.pacman_animator = TimerDict(dict_frames=player_sprites, first_key='up', wait=48)
         """The sprite animation handler."""
 
         self.lives = 3
@@ -75,11 +75,26 @@ class Player(Sprite):
         # TODO: Set new starting tile
         pass
 
+    def get_facing_tile(self, direction:str=None):
+        if direction == None:
+            vec = Player.DIR_VECTOR[self.facing]
+        else:
+            vec = Player.DIR_VECTOR[direction]     
+        return (self.tile_next[0] + vec[0], self.tile_next[1] + vec[1])
+
     def update_tile_next(self):
-        prev = self.tile_next
-        # TODO: detect wall
-        # TODO: set self.tile_next DEPENDING ON self.facing
-        self.tile_next = (prev[0]+1, prev[1])
+        """Determine the next intermediate tile to go to. Should only run when we've reached target tile (self.tile_progress >= 1)"""
+        self.tile = self.tile_next
+        tile_check = self.get_facing_tile()
+        tile_state = self.maze.get_tile_state(Vector(*tile_check))
+        if tile_state not in [-1, 0, 4]:
+            self.tile_next = tile_check
+
+    def try_set_direction(self, direction: str):
+        if self.tile_progress >= 0.8:
+            state = self.maze.get_tile_state(Vector(*self.get_facing_tile(direction)))
+            if state not in [-1, 0, 4]:
+                self.facing = direction
 
     def move(self):
         self.tile_progress += self.play.player_speed*app.Application.FRAME_TIME
