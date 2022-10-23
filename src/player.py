@@ -9,6 +9,7 @@ from timer import Timer, TimerDict, TimerDual
 import maze as mz
 import application as app
 import play as pl
+import ghost as gh
 
  
 class Player(Sprite):
@@ -54,11 +55,39 @@ class Player(Sprite):
         """Player's progress of movement between `self.tile`` and `self.next_tile`.
         Should range 0 to 1 inclusive."""
 
+        self.eaten_ghost = None
+        """Ghost being eaten."""
+
         self.facing = ''
         self.update_facing()
         self.maze.consume_tile(self.tile)
 
-    def on_hit(self):
+    def ghost_interact(self, ghost: gh.Ghost):
+        # eaten; do nothing
+        if ghost.mode in [gh.GhostMode.EATEN, gh.GhostMode.EATEN_INVISIBLE]: return
+
+        if ghost.mode == gh.GhostMode.FRIGHTENED: # frightened
+            ghost.mode = gh.GhostMode.EATEN_INVISIBLE
+            self.play.play_state.pause_timer = 60
+            self.play.play_state.action_pause = True
+            self.play.sound.eat_ghost()
+            # TODO: replace pacman's sprite with score text
+        else: # hostile in all its forms
+            self.hit()
+        
+        self.play.sound.stop_chomping()
+        
+
+    def hit(self):
+        """When Pac Man is hit by a ghost."""
+        pass
+
+    def hit_dying(self):
+        """Begins dying animation."""
+        pass
+
+    def hit_dead(self):
+        """Animation ended; set states."""
         self.lives -= 1
 
     def update_facing(self):
@@ -114,7 +143,7 @@ class Player(Sprite):
     def draw(self):
         self.pacman_animator.key = self.facing
         img = self.pacman_animator.imagerect()
-        # coordinates
+
         r = img.get_rect()
         r.center = self.rect.center
         self.maze.blit_relative(img, r)
