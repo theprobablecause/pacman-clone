@@ -96,7 +96,7 @@ class Ghost(Sprite):
         self.normal_animator = TimerDict(dict_frames=normal_sprites, first_key='up')
         """The sprite animation handler for normal mode."""
 
-        self.frightened_flickering_animator = TimerDual(frames1=frightened_sprites['blue'], frames2=frightened_sprites['white'])
+        self.frightened_flickering_animator = TimerDual(frames1=frightened_sprites['blue'], frames2=frightened_sprites['white'], waitBetween=200)
         """The sprite animation handler for frightened mode (flickering)."""
 
         self.frightened_animator = Timer(frames=frightened_sprites['blue'])
@@ -215,8 +215,8 @@ class Ghost(Sprite):
         # graphic retrieval
         if self.mode == GhostMode.FRIGHTENED: # frightened
             self.image = self.frightened_animator.imagerect()
-            # TODO: switch to flickering as frightened timer ends (last 5s)
-            # self.image = self.frightened_flickering_animator.imagerect()
+            if self.play.play_state.frightened_timer <= 300:
+                self.image = self.frightened_flickering_animator.imagerect()
         elif self.mode == GhostMode.EATEN_INVISIBLE: # just eaten (invisible)
             return
         elif self.mode == GhostMode.EATEN: # eaten (eyes)
