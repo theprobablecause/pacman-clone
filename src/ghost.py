@@ -160,7 +160,7 @@ class Ghost(Sprite):
 
         # When next_tile is reached, update target and next_tile
         if self.tile_progress >= 1:
-            self.tile_progress %= 1
+            self_progress %= 1
             self.tile = [self.tile_next[0], self.tile_next[1]]
 
             # determine target

@@ -72,7 +72,9 @@ class Player(Sprite):
     def reset(self):
         """Runs after death animation is finished."""
         # TODO: Implement reset function (for later)
+        self.maze = Maze.FRESH_MAZE
         # TODO: Set new starting tile
+        self.tile
         pass
 
     def get_facing_tile(self, direction:str=None):
