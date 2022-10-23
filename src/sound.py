@@ -1,4 +1,5 @@
 import pygame as pg
+import application as app
 import time
 
 import application as app
