@@ -3,13 +3,14 @@ import sys
 from timer import Timer
 from button import Button
 from play import Play
+import application as app
 
 class Menu():
     def __init__(self, game):
         self.game = game
         self.screen = game.screen
         self.animation = Timer(
-            frames=[pg.transform.rotozoom(pg.image.load(f'pacman_img/tile{n}.png'), 0, 0.7) for n in range(154)],
+            frames=[pg.transform.rotozoom(pg.image.load(f'{app.Application.PROJECT_DIR}/pacman_img/tile{n}.png'), 0, 0.7) for n in range(154)],
             wait=1000/60
         )
         pg.display.set_caption("PACMAN Menu")
@@ -59,19 +60,23 @@ class Menu():
 
     def main_menu(self):
         self.screen.fill((0, 0, 0))
-        img_pacman = pg.image.load("pacman_img/pacman.png")
+        img_pacman = pg.image.load(app.Application.PROJECT_DIR + "/pacman_img/pacman.png")
         image = pg.transform.scale(img_pacman, (200,200))
         self.img_rect = image.get_rect(center=(575, 110))
         self.screen.blit(image, self.img_rect)
 
+        img_pacmanghost = pg.image.load(app.Application.PROJECT_DIR + "/pacman_img/ghostintro.jpg")
+        image2 = pg.transform.scale(img_pacmanghost, (260,160))
+        self.img2_rect = image2.get_rect(center=(575, 560))
+        self.screen.blit(image2, self.img2_rect)
 
         self.menu_text = self.get_font(140).render(" PA " + " MAN", True, "White")
         menu_rect = self.menu_text.get_rect(center=(570, 100))
 
 
-        self.play_button = Button(None, pos=(600, 580), text_input="PLAY", font=self.get_font(30), base_color="Yellow", hovering_color="Blue")
-        self.high_score_button = Button(None, pos=(600, 640), text_input="HIGH SCORE", font=self.get_font(30), base_color="Yellow", hovering_color="Pink")
-        self.quit_button = Button(None, pos=(600, 700), text_input="QUIT", font=self.get_font(30), base_color="Yellow", hovering_color="Red")
+        self.play_button = Button(None, pos=(600, 680), text_input="PLAY", font=self.get_font(20), base_color="Yellow", hovering_color="Blue")
+        self.high_score_button = Button(None, pos=(600, 715), text_input="HIGH SCORE", font=self.get_font(20), base_color="Yellow", hovering_color="Pink")
+        self.quit_button = Button(None, pos=(600, 750), text_input="QUIT", font=self.get_font(20), base_color="Yellow", hovering_color="Red")
 
         while True:
             self.menu_mouse_pos = pg.mouse.get_pos()
@@ -99,4 +104,3 @@ class Menu():
             self.screen.blit(self.menu_text, menu_rect)
             self.draw_anim_frame()
             self.game.wait_next_frame()
-
