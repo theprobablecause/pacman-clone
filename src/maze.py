@@ -50,6 +50,8 @@ class Maze(Sprite):
 
     WIDTH, HEIGHT = 28, 31
     TILE_SIZE = 24 # 24x24px square
+    PORTAL_A_TILE = (1, 14)
+    PORTAL_B_TILE = (26, 14)
 
     @staticmethod
     def pixel2tile(px_vec: Vector):
@@ -131,8 +133,11 @@ class Maze(Sprite):
 
         if state in [-1, 0]: # (eating inaccessible tile)
             pass
+        elif state == 1: # blank tile
+            self.play.sound.stop_chomping()
         elif state == 2: # food pellet
             self.maze[strpos] = '1'
+            self.play.sound.start_chomping()
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
@@ -140,12 +145,10 @@ class Maze(Sprite):
             self.play.play_state.power_pellet_eatened()
             self.play.sound.music_power_pellet()
             # TODO: change score, counters, flee state
-        elif state == 5:
-            self.maze[strpos] = '1'
-        elif state == 6:
-            self.maze[strpos] = '8'
-        elif state == 7:
-            self.maze[strpos] = '8'
+        elif state == 6: # portal a
+            self.play.player.teleport(Maze.PORTAL_B_TILE)
+        elif state == 7: # portal b
+            self.play.player.teleport(Maze.PORTAL_A_TILE)
 
     def reset(self):
         self.maze = list(Maze.FRESH_MAZE)
