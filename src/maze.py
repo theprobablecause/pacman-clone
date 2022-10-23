@@ -32,7 +32,7 @@ class Maze(Sprite):
         '1611112111011111101112111171'
         '0000002001011111101002000000'
         '0000002001000000001002000000'
-        '0000002001111551111002000000'
+        '0000002001111151111002000000'
         '0000002001000000001002000000'
         '0000002001000000001002000000'
         '0222222222222002222222222220'
@@ -95,6 +95,10 @@ class Maze(Sprite):
         power_sprites[1].set_alpha(0)
         self.power_pellet = Timer(frames=power_sprites, wait=10*1000*app.Application.FRAME_TIME)
 
+        self.bonus_fruit_sprite = {
+            'bonus_fruit': pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/special_food.png"),
+        }
+
         self.portal_sprites = {
             'portal_a': pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/in_blue_portal.png"),
             'portal_b': pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/out_orange_portal.png")
@@ -112,7 +116,8 @@ class Maze(Sprite):
         4: ghost house entrance
         5: bonus fruit
         6: portal a
-        7: portal b"""
+        7: portal b
+        8: teleport"""
         
         if not ((0 <= tile_vec.x and tile_vec.x < Maze.WIDTH) or\
             (0 <= tile_vec.y and tile_vec.y < Maze.HEIGHT)):
@@ -176,6 +181,11 @@ class Maze(Sprite):
                     rect = img.get_rect()
                     rect.center = (tile_ctr.x, tile_ctr.y)
                     self.blit_relative(img, rect)
+                elif state == 5:
+                    img = self.bonus_fruit_sprite['bonus_fruit']
+                    rect = img.get_rect()
+                    rect.center = (tile_ctr.x, tile_ctr.y)
+                    self.blit_relative(img, rect)
                 elif state == 6:
                     img = self.portal_sprites['portal_a']
                     rect = img.get_rect()
@@ -186,6 +196,8 @@ class Maze(Sprite):
                     rect = img.get_rect()
                     rect.center = (tile_ctr.x, tile_ctr.y)
                     self.blit_relative(img, rect)
+                
+                    
 
     def update(self):
         self.draw()
