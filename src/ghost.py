@@ -277,11 +277,19 @@ class Inky(Ghost):
         super().__init__(type='blues', tile_start=(18, 14), tile_scatter=(27, 31), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        pivot = self.play.player.tile
+        vec_diff = Vector(*pivot) - Vector(*self.play.ghosts.sprites()[0].tile)
+        vec_diff.setidx(1, vec_diff.y*-1)
+        self.target = (pivot[0] + vec_diff.x, pivot[1] + vec_diff.y)
 
 class Clyde(Ghost):
     def __init__(self, maze, pacman, play):
         super().__init__(type='oranges', tile_start=(9, 14), tile_scatter=(0, 31), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        tile_player = self.play.player.tile
+        d = Vector.distance_squared(Vector(*self.tile), Vector(*tile_player))
+        if d < 64:
+            self.target = self.tile_scatter
+        else:
+            self.target = tile_player

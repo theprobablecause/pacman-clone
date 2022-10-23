@@ -45,10 +45,10 @@ class Player(Sprite):
         self.lives = 3
         """The player's remaining lives."""
 
-        self.tile = (1, 1)
+        self.tile = (12, 17)
         """The player's last \"steady\" tile."""
 
-        self.tile_next = (2, 1)
+        self.tile_next = (13, 17)
         """The immediate tile for the player to move towards. Should be adjacent to `self.tile`."""
 
         self.tile_progress = 0
