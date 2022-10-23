@@ -216,11 +216,11 @@ class Ghost(Sprite):
         self.maze.blit_relative(self.image, r)
 
         # DEBUG: draw current target
-        # target_vec = mz.Maze.tile2pixelctr(Vector(*self.target))
-        # target_pt = (target_vec.x, target_vec.y)
-        # target_rect = pg.Rect((0, 0), (24, 24))
-        # target_rect.center = target_pt
-        # self.maze.blit_relative(self.debug_draw_rect, target_rect)
+        target_vec = mz.Maze.tile2pixelctr(Vector(*self.target))
+        target_pt = (target_vec.x, target_vec.y)
+        target_rect = pg.Rect((0, 0), (24, 24))
+        target_rect.center = target_pt
+        self.maze.blit_relative(self.debug_draw_rect, target_rect)
 
     def update(self):
         self.move()
@@ -238,7 +238,11 @@ class Pinky(Ghost):
         super().__init__(type='pinks', tile_start=(8, 11), tile_scatter=(2, -4), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        vec_facing = DIR_VECTOR[self.pacman.facing]
+        tile_pac = list(self.pacman.tile)
+        for i in range(2):
+            tile_pac[i] += 4*vec_facing[i]
+        self.target = tuple(tile_pac)
 
 class Inky(Ghost):
     def __init__(self, maze, pacman, play):

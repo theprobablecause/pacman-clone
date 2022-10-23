@@ -71,9 +71,9 @@ class Maze(Sprite):
         x, y = math.floor(tile_vec.x), math.floor(tile_vec.y)
         return x + Maze.WIDTH*y
         
-    def __init__(self, game):
-        self.game = game
-        self.surface: Surface = game.screen
+    def __init__(self, play):
+        self.play = play
+        self.surface: Surface = play.screen
         self.maze = list(Maze.FRESH_MAZE)
         self.image = pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
@@ -120,6 +120,7 @@ class Maze(Sprite):
             pass
         elif state == 2: # food pellet
             self.maze[strpos] = '1'
+            self.play.sound.chomp()
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
