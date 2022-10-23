@@ -132,7 +132,7 @@ class Ghost(Sprite):
             vec = DIR_VECTOR[dir]
             check_tile = (self.tile[0]+vec[0], self.tile[1]+vec[1])
             state = self.maze.get_tile_state(Vector(check_tile[0], check_tile[1]))
-            if state in [0, -1] or (self.mode not in [GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING] and state == 4):
+            if state in [0, -1, 6, 7] or (self.mode not in [GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING] and state == 4):
                 # skip non-traversable, and if not in eaten
                 # state, skip ghost house entrance.
                 continue
@@ -241,11 +241,11 @@ class Ghost(Sprite):
         self.maze.blit_relative(self.image, r)
 
         # DEBUG: draw current target
-        target_vec = mz.Maze.tile2pixelctr(Vector(*self.target))
-        target_pt = (target_vec.x, target_vec.y)
-        target_rect = pg.Rect((0, 0), (24, 24))
-        target_rect.center = target_pt
-        self.maze.blit_relative(self.debug_draw_rect, target_rect)
+        # target_vec = mz.Maze.tile2pixelctr(Vector(*self.target))
+        # target_pt = (target_vec.x, target_vec.y)
+        # target_rect = pg.Rect((0, 0), (24, 24))
+        # target_rect.center = target_pt
+        # self.maze.blit_relative(self.debug_draw_rect, target_rect)
 
     def update_mode(self):
         if self.mode == GhostMode.EATEN_INVISIBLE: self.mode = GhostMode.EATEN

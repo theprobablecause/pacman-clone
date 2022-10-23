@@ -50,6 +50,8 @@ class Maze(Sprite):
 
     WIDTH, HEIGHT = 28, 31
     TILE_SIZE = 24 # 24x24px square
+    PORTAL_A_TILE = (1, 14)
+    PORTAL_B_TILE = (26, 14)
 
     @staticmethod
     def pixel2tile(px_vec: Vector):
@@ -138,9 +140,10 @@ class Maze(Sprite):
             self.play.play_state.power_pellet_eatened()
             self.play.sound.music_power_pellet()
             # TODO: change score, counters, flee state
-        # Nima changes
-        #elif state == 6:
-             #self.maze[strpos] = 
+        elif state == 6: # portal a
+            self.play.player.teleport(Maze.PORTAL_B_TILE)
+        elif state == 7: # portal b
+            self.play.player.teleport(Maze.PORTAL_A_TILE)
 
     def reset(self):
         self.maze = list(Maze.FRESH_MAZE)
