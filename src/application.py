@@ -16,7 +16,7 @@ class Application: # is this class like the game class in space invaders ?
 
     def run(self):
         while True: 
-            g = Menu(game=self)
+            g = Menu(app=self)
             g.main_menu()
             
     # Draw current display buffer to screen, then wait for next frame.
