@@ -1,3 +1,4 @@
+from enum import Enum
 import random
 import pygame as pg
 from pygame.sprite import Sprite
@@ -24,12 +25,22 @@ OPPOSITE_DIR = {
     'right': 'left'
 }
 
+class GhostMode(Enum):
+    SCATTER = 1
+    CHASE = 2
+    FRIGHTENED = 3
+    EATEN_INVISIBLE = 4
+    EATEN = 5
+    GHOST_HOUSE_JOINING = 6
+    GHOST_HOUSE_INSIDE = 7
+    GHOST_HOUSE_LEAVING = 8
+
 class Ghost(Sprite):
     """Base class for the ghosts. Should not be instantiated!"""
     FRIGHTENED_SPEED = 3
     EATEN_SPEED = 20
 
-    def __init__(self, type, tile_start, tile_scatter, maze: mz.Maze, pacman, play):
+    def __init__(self, type, tile_start, tile_scatter, maze, pacman, play):
         super().__init__()
         self.pacman = pacman
         self.maze = maze
@@ -58,16 +69,8 @@ class Ghost(Sprite):
         self.facing = 'right'
         """Which way the ghost is currently facing."""
 
-        self.mode = 0
-        """The ghost's current behavior mode.
-        
-        Possible modes:
-        0: Scatter
-        1: Chase
-        2: Frightened
-        3: Eaten
-        4: In ghost house
-        5: Leaving ghost house"""
+        self.mode: GhostMode = 0
+        """The ghost's current behavior mode. Refer to the `GhostMode` enum."""
 
         self.debug_draw_rect = pg.surface.Surface(size=(24, 24))
         self.debug_draw_rect.fill((255, 0, 0))
@@ -93,7 +96,7 @@ class Ghost(Sprite):
         self.normal_animator = TimerDict(dict_frames=normal_sprites, first_key='up')
         """The sprite animation handler for normal mode."""
 
-        self.frightened_flickering_animator = TimerDual(frames1=frightened_sprites['blue'], frames2=frightened_sprites['white'])
+        self.frightened_flickering_animator = TimerDual(frames1=frightened_sprites['blue'], frames2=frightened_sprites['white'], waitBetween=200)
         """The sprite animation handler for frightened mode (flickering)."""
 
         self.frightened_animator = Timer(frames=frightened_sprites['blue'])
@@ -106,7 +109,7 @@ class Ghost(Sprite):
         self.update_facing()
 
     def set_mode(self, mode):
-        if self.mode != 3:
+        if self.mode not in [GhostMode.EATEN, GhostMode.EATEN_INVISIBLE, GhostMode.GHOST_HOUSE_INSIDE, GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING]:
             self.mode = mode
             self.flip()
 
@@ -129,7 +132,7 @@ class Ghost(Sprite):
             vec = DIR_VECTOR[dir]
             check_tile = (self.tile[0]+vec[0], self.tile[1]+vec[1])
             state = self.maze.get_tile_state(Vector(check_tile[0], check_tile[1]))
-            if state in [0, -1] or (self.mode != 3 and state == 4):
+            if state in [0, -1] or (self.mode not in [GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING] and state == 4):
                 # skip non-traversable, and if not in eaten
                 # state, skip ghost house entrance.
                 continue
@@ -137,7 +140,7 @@ class Ghost(Sprite):
             dist[dir] = Vector.distance_squared(Vector(*check_tile), Vector(*self.target))
         
         if len(candidate_tiles) > 0:
-            if self.mode == 2:
+            if self.mode == GhostMode.FRIGHTENED:
                 # frightened; pick random tile
                 dir = random.choice(list(candidate_tiles.keys()))
             else:
@@ -166,26 +169,37 @@ class Ghost(Sprite):
         # When next_tile is reached, update target and next_tile
         if self.tile_progress >= 1:
             self.tile_progress %= 1
-            self.tile = [self.tile_next[0], self.tile_next[1]]
+            self.tile = (self.tile_next[0], self.tile_next[1])
 
             # determine target
-            if self.mode == 0:
+            if self.mode == GhostMode.SCATTER:
                 # scatter
                 self.target = self.tile_scatter
-            elif self.mode == 1:
+            elif self.mode == GhostMode.CHASE:
                 # chase
                 self.update_chase_target()
-            elif self.mode == 3:
-                # TODO: ghost house
-                pass
+            elif self.mode == GhostMode.EATEN:
+                self.target = (13, 11)
+                if self.tile == (13, 11):
+                    self.mode = GhostMode.GHOST_HOUSE_JOINING
+            # moving in/out the ghost house
+            if self.mode == GhostMode.GHOST_HOUSE_JOINING:
+                self.target = (13, 14)
+                if self.tile == (13, 14):
+                    self.mode = GhostMode.GHOST_HOUSE_LEAVING
+            if self.mode == GhostMode.GHOST_HOUSE_LEAVING:
+                self.target = (13, 11)
+                if self.tile == (13, 11):
+                    self.mode = self.play.play_state.mode_ghosts
+                    self.flip()
 
             self.update_next_tile()
             self.update_facing()
         
         # Move towards next_tile
-        if self.mode == 2:
+        if self.mode == GhostMode.FRIGHTENED:
             speed = Ghost.FRIGHTENED_SPEED
-        elif self.mode == 3:
+        elif self.mode == GhostMode.EATEN:
             speed = Ghost.EATEN_SPEED
         else:
             speed = self.play.ghosts_speed
@@ -207,19 +221,14 @@ class Ghost(Sprite):
         self.tile_progress = 1 - self.tile_progress
 
     def draw(self):
-        # coordinates
-        current_tile = Vector(
-            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
-            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
-        )
-        px = mz.Maze.tile2pixelctr(current_tile)
-
         # graphic retrieval
-        if self.mode == 2: # frightened
+        if self.mode == GhostMode.FRIGHTENED: # frightened
             self.image = self.frightened_animator.imagerect()
-            # TODO: switch to flickering as frightened timer ends (last 5s)
-            # self.image = self.frightened_flickering_animator.imagerect()
-        elif self.mode == 3:
+            if self.play.play_state.frightened_timer <= 300:
+                self.image = self.frightened_flickering_animator.imagerect()
+        elif self.mode == GhostMode.EATEN_INVISIBLE: # just eaten (invisible)
+            return
+        elif self.mode in [GhostMode.EATEN, GhostMode.GHOST_HOUSE_JOINING]: # eaten (eyes)
             self.eaten_animator.key = self.facing
             self.image = self.eaten_animator.imagerect()
         else: # normal
@@ -238,7 +247,11 @@ class Ghost(Sprite):
         target_rect.center = target_pt
         self.maze.blit_relative(self.debug_draw_rect, target_rect)
 
+    def update_mode(self):
+        if self.mode == GhostMode.EATEN_INVISIBLE: self.mode = GhostMode.EATEN
+
     def update(self):
+        self.update_mode()
         self.move()
 
 class Blinky(Ghost):
@@ -264,11 +277,19 @@ class Inky(Ghost):
         super().__init__(type='blues', tile_start=(18, 14), tile_scatter=(27, 31), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        pivot = self.play.player.tile
+        vec_diff = Vector(*pivot) - Vector(*self.play.ghosts.sprites()[0].tile)
+        vec_diff.setidx(1, vec_diff.y*-1)
+        self.target = (pivot[0] + vec_diff.x, pivot[1] + vec_diff.y)
 
 class Clyde(Ghost):
     def __init__(self, maze, pacman, play):
         super().__init__(type='oranges', tile_start=(9, 14), tile_scatter=(0, 31), maze=maze, pacman=pacman, play=play)
     
     def update_chase_target(self):
-        pass
+        tile_player = self.play.player.tile
+        d = Vector.distance_squared(Vector(*self.tile), Vector(*tile_player))
+        if d < 64:
+            self.target = self.tile_scatter
+        else:
+            self.target = tile_player

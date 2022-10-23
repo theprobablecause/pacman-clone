@@ -40,8 +40,10 @@ class Play:
             g.set_mode(mode)
 
     def collision_check(self):
-        # cols = self.player.coll
-        pass
+        cols = pg.sprite.spritecollide(self.player, self.ghosts, False)
+        if len(cols) > 0:
+            g = cols[0]
+            self.player.ghost_interact(g)
 
     def run(self):
         self.sound.music_normal()
@@ -50,9 +52,10 @@ class Play:
             ge.process_events(self)
             self.play_state.update()
 
-            self.ghosts.update()
-            self.player.update()
-            self.collision_check()
+            if not self.play_state.action_pause:
+                self.ghosts.update()
+                self.player.update()
+                self.collision_check()
 
             self.maze.draw()
             for g in self.ghosts:

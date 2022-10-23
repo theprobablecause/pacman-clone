@@ -4,11 +4,13 @@ import numpy
 import pygame as pg
 from pygame import Surface
 from pygame.sprite import Sprite
+
 from timer import Timer
 from util import clip
 
-from vector import Vector
 import application as app
+from vector import Vector
+import ghost as gh
 
 class Maze(Sprite):
 
@@ -129,6 +131,9 @@ class Maze(Sprite):
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
+            self.play.set_ghosts_mode(gh.GhostMode.FRIGHTENED)
+            self.play.play_state.power_pellet_eatened()
+            self.play.sound.music_power_pellet()
             # TODO: change score, counters, flee state
         # Nima changes
         #elif state == 6:

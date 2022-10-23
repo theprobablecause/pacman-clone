@@ -1,5 +1,7 @@
 import pygame as pg
 
+import ghost as gh
+
 class PGStopwatch:
     """A stopwatch that uses PyGame's timing functions."""
     def __init__(self):
@@ -40,16 +42,16 @@ class PGStopwatch:
 
 class PlayState:
     MODE_TIMER = {
-        0: 420,
-        1: 1200,
-        2: 700
+        gh.GhostMode.SCATTER: 420,
+        gh.GhostMode.CHASE: 1200,
+        gh.GhostMode.FRIGHTENED: 700
     }
-    """Frames remaining until mode ends. Should tick down every frame (1/60 of a second).
-    
-    Mode keys:
-    0: scatter
-    1: chase
-    2: frightened"""
+
+    MODE_NATURAL_NEXT = {
+        gh.GhostMode.SCATTER: gh.GhostMode.CHASE,
+        gh.GhostMode.CHASE: gh.GhostMode.SCATTER
+    }
+    """Frames remaining until mode ends. Should tick down every frame (1/60 of a second)."""
 
     def __init__(self, play):
         self.sw = PGStopwatch()
@@ -65,13 +67,16 @@ class PlayState:
         self.action_pause = False
         """Game will not be player-pausable; this is more for effect."""
 
+        self.pause_timer = 0
+        """How much time to keep the game paused (in frames)."""
+
         self.is_frightened = False
         """Whether we are in frightened mode or not."""
 
-        self.frightened_timer = PlayState.MODE_TIMER[2]
+        self.frightened_timer = PlayState.MODE_TIMER[gh.GhostMode.FRIGHTENED]
         """Frames remaining in frightened mode. Starts at 600."""
 
-        self.mode_ghosts = 0
+        self.mode_ghosts = gh.GhostMode.SCATTER
         '''Mode the ghosts should preferably stay at.
         
         Possible values:
@@ -85,29 +90,35 @@ class PlayState:
 
     def power_pellet_eatened(self):
         self.is_frightened = True
-        self.frightened_timer = PlayState.MODE_TIMER[2]
+        self.frightened_timer = PlayState.MODE_TIMER[gh.GhostMode.FRIGHTENED]
 
     def reset_after_death(self):
         self.portal_a = None
         self.portal_b = None
-        self.mode_ghosts = 0
+        self.mode_ghosts = gh.GhostMode.SCATTER
         self.mode_countdown = PlayState.MODE_TIMER[self.mode_ghosts]
 
     def update_ghost_mode(self):
         if self.is_frightened:
             self.frightened_timer -= 1
             if self.frightened_timer <= 0:
-                self.frightened_timer = PlayState.MODE_TIMER[2]
+                self.frightened_timer = PlayState.MODE_TIMER[gh.GhostMode.FRIGHTENED]
                 self.is_frightened = False
                 self.play.set_ghosts_mode(self.mode_ghosts)
                 self.play.sound.music_normal()
         else:
             self.mode_countdown -= 1
             if self.mode_countdown <= 0:
-                self.mode_ghosts = (self.mode_ghosts + 1) % 2
+                self.mode_ghosts = PlayState.MODE_NATURAL_NEXT[self.mode_ghosts]
                 self.mode_countdown = PlayState.MODE_TIMER[self.mode_ghosts]
                 self.play.set_ghosts_mode(self.mode_ghosts)
 
+    def update_action_pause(self):
+        if self.pause_timer > 0: self.pause_timer -= 1
+        self.action_pause = self.pause_timer > 0
 
     def update(self):
+        self.update_action_pause()
+        if self.action_pause: return
+        
         self.update_ghost_mode()
