@@ -61,7 +61,7 @@ class TimerDict:
         self.dict_frames = dict_frames
         self.dict_timers = {}
         for k, v in self.dict_frames.items():
-            self.dict_timers[k] = Timer(v)
+            self.dict_timers[k] = Timer(v, wait=wait, looponce=looponce)
         self.timer = self.dict_timers[first_key]
         self.key = first_key
 
