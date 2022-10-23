@@ -1,4 +1,5 @@
 import pygame as pg
+import application as app
 import time
 
 
@@ -9,13 +10,14 @@ class Sound:
         pg.mixer.music.set_volume(0.7)
 
         # level_up_sound = pg.mixer.Sound('sounds/ .wav')
-        ghost_run_sound = pg.mixer.Sound('sounds/ pacman_intermission.wav')
-        game_over_sound = pg.mixer.Sound('sounds/death.wav')
-        points_sound = pg.mixer.Sound('sounds/pacman_chomp.wav')
-        power_pill_sound = pg.mixer.Sound('sounds/pill_sound.wav')
-        pacman_eat_ghost = pg.mixer.Sound('sounds/pacman_eatghost.wav')
+        ghost_run_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_intermission.wav')
+        game_over_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_death.wav')
+        points_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_chomp.wav')
+        power_pill_sound = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/sounds/pill_sound.wav')
+        pacman_eat_ghost = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_eatghost.wav')
         self.sounds = {'ghost_run': ghost_run_sound, 'game_over': game_over_sound,
                        'points': points_sound, 'power': power_pill_sound, 'eat_ghost': pacman_eat_ghost}
+        
 
     def stop_bg(self):
         pg.mixer.music.stop()
