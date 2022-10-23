@@ -1,20 +1,21 @@
 import pygame as pg
+import application as app
 
 class Scoreboard():
     power_pallet_points = 100
     dot_food_points = 10
     ghost_points = 200
 
-    def __init__(self, game): # game is an instance of application class/game
+    def __init__(self, play): # game is an instance of application class/game
         # what is settings in this case if we compare with the space invaders ?
         self.score = 0
         self.level = 0
         self.high_score = 0
-        self.game = game # using the entire application class by using its instance game ?
-        self.screen = game.screen # accessing application screen variable ?
+        self.play = play # using the entire application class by using its instance game ?
+        self.screen = play.screen # accessing application screen variable ?
         self.screen_rect = self.screen.get_rect() 
         self.text_color = (255, 255, 255) # white color
-        self.font = pg.font.SysFont(None, 48) # no font type assigned and size 48
+        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 16) # no font type assigned and size 48
         self.score_image = None 
         self.score_rect = None
         self.high_score_image = None

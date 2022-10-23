@@ -166,4 +166,4 @@ class Maze(Sprite):
                     self.blit_relative(img, rect)
 
     def update(self):
-        self.draw()
+        pass

@@ -8,11 +8,13 @@ import ghost as gh
 from play_state import PlayState
 import player
 from sound import Sound
+import scoreboard as sb
 
 class Play:
     def __init__(self, app):
         self.app = app
         self.screen:Surface = app.screen
+        self.scoreboard = sb.Scoreboard(play=self)
         self.maze = mz.Maze(play=self)
         self.play_state = PlayState(play=self)
 
@@ -37,13 +39,25 @@ class Play:
         for g in self.ghosts:
             g.set_mode(mode)
 
+    def collision_check(self):
+        # cols = self.player.coll
+        pass
+
     def run(self):
         self.sound.music_normal()
         while True:
             self.screen.fill((0, 0, 0))
             ge.process_events(self)
             self.play_state.update()
-            self.maze.update()
+
             self.ghosts.update()
             self.player.update()
+            self.collision_check()
+
+            self.maze.draw()
+            for g in self.ghosts:
+                g.draw()
+            self.player.draw()
+            self.scoreboard.update()
+
             self.app.wait_next_frame()

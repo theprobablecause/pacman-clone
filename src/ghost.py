@@ -34,7 +34,7 @@ class Ghost(Sprite):
         self.pacman = pacman
         self.maze = maze
         self.play = play
-        self.rect_hitbox = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
         
         self.tile_start = tile_start
         """The tile to spawn on at the very beginning of a game."""
@@ -58,7 +58,7 @@ class Ghost(Sprite):
         self.facing = 'right'
         """Which way the ghost is currently facing."""
 
-        self.mode = 1
+        self.mode = 0
         """The ghost's current behavior mode.
         
         Possible modes:
@@ -190,7 +190,13 @@ class Ghost(Sprite):
         else:
             speed = self.play.ghosts_speed
         self.tile_progress += speed*app.Application.FRAME_TIME
-        # TODO: update self.rect_hitbox
+        
+        current_tile = Vector(
+            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+        )
+        px = mz.Maze.tile2pixelctr(current_tile)
+        self.rect.center = (px.x, px.y)
     
     def flip(self):
         """Flip our movement completely."""
@@ -220,8 +226,9 @@ class Ghost(Sprite):
             self.normal_animator.key = self.facing
             self.image = self.normal_animator.imagerect()
 
+        # coordinates
         r = self.image.get_rect()
-        r.center = (px.x, px.y)
+        r.center = self.rect.center
         self.maze.blit_relative(self.image, r)
 
         # DEBUG: draw current target
@@ -233,7 +240,6 @@ class Ghost(Sprite):
 
     def update(self):
         self.move()
-        self.draw()
 
 class Blinky(Ghost):
     def __init__(self, maze, pacman, play):
