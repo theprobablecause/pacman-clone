@@ -31,14 +31,14 @@ class GhostMode(Enum):
     FRIGHTENED = 3
     EATEN_INVISIBLE = 4
     EATEN = 5
-    GHOST_HOUSE_INSIDE = 6
-    GHOST_HOUSE_LEAVING = 7
+    GHOST_HOUSE_JOINING = 6
+    GHOST_HOUSE_INSIDE = 7
+    GHOST_HOUSE_LEAVING = 8
 
 class Ghost(Sprite):
     """Base class for the ghosts. Should not be instantiated!"""
     FRIGHTENED_SPEED = 3
     EATEN_SPEED = 20
-    GHOST_HOUSE_ENTRANCE = (13, 11)
 
     def __init__(self, type, tile_start, tile_scatter, maze, pacman, play):
         super().__init__()
@@ -109,7 +109,7 @@ class Ghost(Sprite):
         self.update_facing()
 
     def set_mode(self, mode):
-        if self.mode not in [GhostMode.EATEN, GhostMode.EATEN_INVISIBLE]:
+        if self.mode not in [GhostMode.EATEN, GhostMode.EATEN_INVISIBLE, GhostMode.GHOST_HOUSE_INSIDE, GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING]:
             self.mode = mode
             self.flip()
 
@@ -132,7 +132,7 @@ class Ghost(Sprite):
             vec = DIR_VECTOR[dir]
             check_tile = (self.tile[0]+vec[0], self.tile[1]+vec[1])
             state = self.maze.get_tile_state(Vector(check_tile[0], check_tile[1]))
-            if state in [0, -1] or (self.mode != GhostMode.EATEN and state == 4):
+            if state in [0, -1] or (self.mode not in [GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING] and state == 4):
                 # skip non-traversable, and if not in eaten
                 # state, skip ghost house entrance.
                 continue
@@ -169,7 +169,7 @@ class Ghost(Sprite):
         # When next_tile is reached, update target and next_tile
         if self.tile_progress >= 1:
             self.tile_progress %= 1
-            self.tile = [self.tile_next[0], self.tile_next[1]]
+            self.tile = (self.tile_next[0], self.tile_next[1])
 
             # determine target
             if self.mode == GhostMode.SCATTER:
@@ -179,10 +179,19 @@ class Ghost(Sprite):
                 # chase
                 self.update_chase_target()
             elif self.mode == GhostMode.EATEN:
-                if self.tile == Ghost.GHOST_HOUSE_ENTRANCE:
-                    pass
-                else:
-                    self.target = Ghost.GHOST_HOUSE_ENTRANCE
+                self.target = (13, 11)
+                if self.tile == (13, 11):
+                    self.mode = GhostMode.GHOST_HOUSE_JOINING
+            # moving in/out the ghost house
+            if self.mode == GhostMode.GHOST_HOUSE_JOINING:
+                self.target = (13, 14)
+                if self.tile == (13, 14):
+                    self.mode = GhostMode.GHOST_HOUSE_LEAVING
+            if self.mode == GhostMode.GHOST_HOUSE_LEAVING:
+                self.target = (13, 11)
+                if self.tile == (13, 11):
+                    self.mode = self.play.play_state.mode_ghosts
+                    self.flip()
 
             self.update_next_tile()
             self.update_facing()
@@ -219,7 +228,7 @@ class Ghost(Sprite):
                 self.image = self.frightened_flickering_animator.imagerect()
         elif self.mode == GhostMode.EATEN_INVISIBLE: # just eaten (invisible)
             return
-        elif self.mode == GhostMode.EATEN: # eaten (eyes)
+        elif self.mode in [GhostMode.EATEN, GhostMode.GHOST_HOUSE_JOINING]: # eaten (eyes)
             self.eaten_animator.key = self.facing
             self.image = self.eaten_animator.imagerect()
         else: # normal
