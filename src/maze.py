@@ -27,7 +27,7 @@ class Maze(Sprite):
         '0000002001111111111002000000'
         '0000002001000440001002000000'
         '0000002001011111101002000000'
-        '1611112111011111101112111161'
+        '1611112111011111101112111171'
         '0000002001011111101002000000'
         '0000002001000000001002000000'
         '0000002001111551111002000000'
@@ -77,14 +77,8 @@ class Maze(Sprite):
         self.image = pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
-        self.rect_hitbox = pg.Rect((0, 0), (Maze.TILE_SIZE, Maze.TILE_SIZE))
 
-        portal_sprites = {
-            'blue_portal': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/in_blue_portal.png")],
-            'orange_portal': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/out_orange_portal.png")]
-        }
-
-         # edible sprites
+        # edible sprites
         self.debug_tile = pg.surface.Surface(size=(20, 20))
         self.debug_tile.fill((34, 34, 34))
         self.debug_tile.set_alpha(230)
@@ -96,6 +90,11 @@ class Maze(Sprite):
         ]
         power_sprites[1].set_alpha(0)
         self.power_pellet = Timer(frames=power_sprites, wait=10*1000*app.Application.FRAME_TIME)
+
+        self.portal_sprites = {
+            'portal_a': pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/in_blue_portal.png"),
+            'portal_b': pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/out_orange_portal.png")
+        }
     
     def get_tile_state(self, tile_vec: Vector):
         """Returns the state of a tile.
@@ -108,7 +107,9 @@ class Maze(Sprite):
         3: power pellet
         4: ghost house entrance
         5: bonus fruit
-        6: portal"""
+        6: portal a
+        7: portal b"""
+        
         if not ((0 <= tile_vec.x and tile_vec.x < Maze.WIDTH) or\
             (0 <= tile_vec.y and tile_vec.y < Maze.HEIGHT)):
             return -1
@@ -161,6 +162,16 @@ class Maze(Sprite):
                     self.blit_relative(self.food_pellet, rect)
                 elif state == 3:
                     img:Surface = self.power_pellet.imagerect()
+                    rect = img.get_rect()
+                    rect.center = (tile_ctr.x, tile_ctr.y)
+                    self.blit_relative(img, rect)
+                elif state == 6:
+                    img = self.portal_sprites['portal_a']
+                    rect = img.get_rect()
+                    rect.center = (tile_ctr.x, tile_ctr.y)
+                    self.blit_relative(img, rect)
+                elif state == 7:
+                    img = self.portal_sprites['portal_b']
                     rect = img.get_rect()
                     rect.center = (tile_ctr.x, tile_ctr.y)
                     self.blit_relative(img, rect)
