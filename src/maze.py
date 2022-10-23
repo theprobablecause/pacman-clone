@@ -118,12 +118,19 @@ class Maze(Sprite):
 
         if state in [-1, 0]: # (eating inaccessible tile)
             pass
+        elif state == 1: # blank tile
+            self.play.sound.stop_chomping()
+            pass
         elif state == 2: # food pellet
             self.maze[strpos] = '1'
-            self.play.sound.chomp()
+            self.play.sound.start_chomping()
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
+            for ghost in self.play.ghosts:
+                ghost.set_mode(2)
+                self.play.play_state.power_pellet_eatened()
+                self.play.sound.music_power_pellet()
             # TODO: change score, counters, flee state
 
     def reset(self):

@@ -21,33 +21,37 @@ class Sound:
         }
 
         self.siren = [f'{app.Application.PROJECT_DIR}/resources/sounds/siren_{x}.wav' for x in range (1,6)]
-        self.power_pellet = f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav'
+        self.audio_power_pellet = f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav'
 
-        pg.mixer.music.load(self.siren[0])
         pg.mixer.music.set_volume(0.35)
         self.chomp_channel.set_volume(0.5)
+        self.music_normal()
 
-    def stop_bg(self):
+    def music_stop(self):
         pg.mixer.music.stop()
 
-    def play_bg(self):
+    def music_normal(self):
+        self.music_stop()
+        pg.mixer.music.load(self.siren[0])
         pg.mixer.music.play(-1, 0.0)
 
-    def ghost_run(self):
-        pg.mixer.Sound.play(self.sfx['ghost_run'])
+    def music_power_pellet(self):
+        self.music_stop()
+        pg.mixer.music.load(self.audio_power_pellet)
+        pg.mixer.music.play(loops=-1)
 
-    def chomp(self):
+    def start_chomping(self):
         if not self.chomp_channel.get_busy():
-            self.chomp_channel.play(self.sfx['chomp'])
-
-    def power_up(self):
-        pg.mixer.Sound.play(self.sfx['power'])
+            self.chomp_channel.play(self.sfx['chomp'], loops=-1)
+    
+    def stop_chomping(self):
+        self.chomp_channel.stop()
 
     def eat_ghost(self):
         pg.mixer.Sound.play(self.sfx['eat_ghost'])
 
     def game_over(self):
-        self.stop_bg()
+        self.music_stop()
         pg.mixer.Sound.play(self.sfx['game_over'])
         time.sleep(2.8)
     

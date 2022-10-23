@@ -105,6 +105,11 @@ class Ghost(Sprite):
         self.update_next_tile()
         self.update_facing()
 
+    def set_mode(self, mode):
+        if self.mode != 3:
+            self.mode = mode
+            self.flip()
+
     def update_chase_target(self) -> None:
         """OVERRIDE: Set the next target tile. Should only modify `self.target`!"""
         pass
@@ -189,7 +194,11 @@ class Ghost(Sprite):
     
     def flip(self):
         """Flip our movement completely."""
-        pass
+        self.facing = OPPOSITE_DIR[self.facing]
+        self.tile_temp = self.tile_next
+        self.tile_next = self.tile
+        self.tile = self.tile_temp
+        self.tile_progress = 1 - self.tile_progress
 
     def draw(self):
         # coordinates
