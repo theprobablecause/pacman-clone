@@ -1,5 +1,4 @@
 
-#######("NOAH KHAYAT")
 import math
 import numpy
 import pygame as pg
@@ -28,10 +27,10 @@ class Maze(Sprite):
         '0000002001111111111002000000'
         '0000002001000440001002000000'
         '0000002001011111101002000000'
-        '1111112111011111101112111111'
+        '1611112111011111101112111161'
         '0000002001011111101002000000'
         '0000002001000000001002000000'
-        '0000002001111111111002000000'
+        '0000002001111551111002000000'
         '0000002001000000001002000000'
         '0000002001000000001002000000'
         '0222222222222002222222222220'
@@ -78,8 +77,14 @@ class Maze(Sprite):
         self.image = pg.image.load(app.Application.PROJECT_DIR + '/resources/sprites/maze.png')
         self.rect = self.image.get_rect()
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
+        self.rect_hitbox = pg.Rect((0, 0), (Maze.TILE_SIZE, Maze.TILE_SIZE))
 
-        # edible sprites
+        portal_sprites = {
+            'blue_portal': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/in_blue_portal.png")],
+            'orange_portal': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/out_orange_portal.png")]
+        }
+
+         # edible sprites
         self.debug_tile = pg.surface.Surface(size=(20, 20))
         self.debug_tile.fill((34, 34, 34))
         self.debug_tile.set_alpha(230)
@@ -118,20 +123,15 @@ class Maze(Sprite):
 
         if state in [-1, 0]: # (eating inaccessible tile)
             pass
-        elif state == 1: # blank tile
-            self.play.sound.stop_chomping()
-            pass
         elif state == 2: # food pellet
             self.maze[strpos] = '1'
-            self.play.sound.start_chomping()
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
-            for ghost in self.play.ghosts:
-                ghost.set_mode(2)
-                self.play.play_state.power_pellet_eatened()
-                self.play.sound.music_power_pellet()
             # TODO: change score, counters, flee state
+        # Nima changes
+        #elif state == 6:
+             #self.maze[strpos] = 
 
     def reset(self):
         self.maze = list(Maze.FRESH_MAZE)
@@ -166,4 +166,4 @@ class Maze(Sprite):
                     self.blit_relative(img, rect)
 
     def update(self):
-        pass
+        self.draw()

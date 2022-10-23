@@ -6,9 +6,9 @@ from play import Play
 import application as app
 
 class Menu():
-    def __init__(self, game):
-        self.game = game
-        self.screen = game.screen
+    def __init__(self, app):
+        self.app = app
+        self.screen = app.screen
         self.animation = Timer(
             frames=[pg.transform.rotozoom(pg.image.load(f'{app.Application.PROJECT_DIR}/pacman_img/tile{n}.png'), 0, 0.7) for n in range(154)],
             wait=1000/60
@@ -50,7 +50,7 @@ class Menu():
                     if self.hs_back.checkForInput(self.score_mouse_pos):
                         self.main_menu()
                         
-            self.game.wait_next_frame()
+            self.app.wait_next_frame()
 
     def draw_anim_frame(self):
             image = self.animation.imagerect()
@@ -88,7 +88,7 @@ class Menu():
                 if event.type == pg.MOUSEBUTTONDOWN:
                     if self.play_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PAC MAN")
-                        p = Play(app=self.game)
+                        p = Play(app=self.app)
                         p.run()
                     if self.high_score_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PACMAN High Score")
@@ -103,4 +103,4 @@ class Menu():
 
             self.screen.blit(self.menu_text, menu_rect)
             self.draw_anim_frame()
-            self.game.wait_next_frame()
+            self.app.wait_next_frame()
