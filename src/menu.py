@@ -3,14 +3,14 @@ import sys
 from timer import Timer
 from button import Button
 from play import Play
-import application as app
+import application
 
 class Menu():
     def __init__(self, app):
         self.app = app
         self.screen = app.screen
         self.animation = Timer(
-            frames=[pg.transform.rotozoom(pg.image.load(f'{app.Application.PROJECT_DIR}/pacman_img/tile{n}.png'), 0, 0.7) for n in range(154)],
+            frames=[pg.transform.rotozoom(pg.image.load(f'{application.Application.PROJECT_DIR}/pacman_img/tile{n}.png'), 0, 0.7) for n in range(154)],
             wait=1000/60
         )
         pg.display.set_caption("PACMAN Menu")
@@ -60,12 +60,12 @@ class Menu():
 
     def main_menu(self):
         self.screen.fill((0, 0, 0))
-        img_pacman = pg.image.load(app.Application.PROJECT_DIR + "/pacman_img/pacman.png")
+        img_pacman = pg.image.load(application.Application.PROJECT_DIR + "/pacman_img/pacman.png")
         image = pg.transform.scale(img_pacman, (200,200))
         self.img_rect = image.get_rect(center=(575, 110))
         self.screen.blit(image, self.img_rect)
 
-        img_pacmanghost = pg.image.load(app.Application.PROJECT_DIR + "/pacman_img/ghostintro.jpg")
+        img_pacmanghost = pg.image.load(application.Application.PROJECT_DIR + "/pacman_img/ghostintro.jpg")
         image2 = pg.transform.scale(img_pacmanghost, (260,160))
         self.img2_rect = image2.get_rect(center=(575, 560))
         self.screen.blit(image2, self.img2_rect)
