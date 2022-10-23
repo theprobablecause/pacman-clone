@@ -105,8 +105,8 @@ class Player(Sprite):
             self.update_facing()
 
         current_tile = Vector(
-            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
-            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+            self.lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            self.lerp(self.tile[1], self.tile_next[1], self.tile_progress)
         )
         px = mz.Maze.tile2pixelctr(current_tile)
         self.rect.center = (px.x, px.y)

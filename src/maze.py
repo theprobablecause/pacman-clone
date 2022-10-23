@@ -136,11 +136,11 @@ class Maze(Sprite):
             self.maze[strpos] = '1'
             # TODO: change score, counters, flee state
         elif state == 5:
-             self.maze[strpos] = '1'
+            self.maze[strpos] = '1'
         elif state == 6:
-             self.maze[strpos] = '8'
+            self.maze[strpos] = '8'
         elif state == 7:
-             self.maze[strpos] = '8'
+            self.maze[strpos] = '8'
 
     def reset(self):
         self.maze = list(Maze.FRESH_MAZE)
@@ -188,6 +188,7 @@ class Maze(Sprite):
                     rect = img.get_rect()
                     rect.center = (tile_ctr.x, tile_ctr.y)
                     self.blit_relative(img, rect)
+                
                     
 
     def update(self):
