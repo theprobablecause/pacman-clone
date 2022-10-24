@@ -82,6 +82,9 @@ class Maze(Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = numpy.subtract(self.surface.get_rect().center, self.rect.center)
 
+        self.remaining_pellets = 244
+        """Pellets left to eat before moving to the next level."""
+
         # edible sprites
         self.debug_tile = pg.surface.Surface(size=(20, 20))
         self.debug_tile.fill((34, 34, 34))
@@ -138,12 +141,14 @@ class Maze(Sprite):
         elif state == 2: # food pellet
             self.maze[strpos] = '1'
             self.play.sound.start_chomping()
+            self.remaining_pellets -= 1
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
             self.play.set_ghosts_mode(gh.GhostMode.FRIGHTENED)
             self.play.play_state.power_pellet_eatened()
             self.play.sound.music_power_pellet()
+            self.remaining_pellets -= 1
             # TODO: change score, counters, flee state
         elif state == 6: # portal a
             self.play.player.teleport(Maze.PORTAL_B_TILE)
@@ -152,15 +157,18 @@ class Maze(Sprite):
 
     def reset(self):
         self.maze = list(Maze.FRESH_MAZE)
+        self.remaining_pellets = 244
     
     def blit_relative(self, surface: Surface, rect: pg.Rect):
         r = rect.copy()
         r.center = (rect.center[0] + self.rect.left, rect.center[1] + self.rect.top)
         self.surface.blit(surface, r)
 
-    def draw(self):
+    def draw(self, draw_tiles = True):
         """Draw maze walls, as well as remaining consumables in play."""
         self.surface.blit(self.image, self.rect)
+        if not draw_tiles: return
+        
         for y in range(Maze.HEIGHT):
             for x in range(Maze.WIDTH):
                 state = self.get_tile_state(Vector(x, y))

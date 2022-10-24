@@ -44,6 +44,11 @@ class Player(Sprite):
         self.pacman_animator = TimerDict(dict_frames=player_sprites, first_key='up', wait=48)
         """The sprite animation handler."""
 
+        death_sprites = [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/dead_pacs_{x}.png") for x in range(1, 12)]
+        self.death_animator = Timer(death_sprites, looponce=True)
+
+        """Sprite animation handler for Pac Man's death animation."""
+
         self.lives = 3
         """The player's remaining lives."""
 
@@ -118,6 +123,8 @@ class Player(Sprite):
         self.update_tile_next()
         self.hit = False
         self.death_phase = -1
+        self.death_animator.reset()
+        self.pacman_animator.reset()
         pass
 
     def get_facing_tile(self, direction:str=None):
@@ -161,8 +168,7 @@ class Player(Sprite):
 
     def dying(self):
         if self.death_phase == -1: # just got hit
-            self.play.sound.stop_chomping()
-            self.play.sound.music_stop()
+            self.play.sound.stop_all()
             self.play.play_state.action_pause(60)
             self.death_phase = 0
         if self.death_phase == 0:
@@ -170,25 +176,30 @@ class Player(Sprite):
                 self.play.play_state.hide_ghosts = True
                 self.play.play_state.action_pause(30)
                 self.death_phase = 1
+                self.image = self.death_animator.imagerect()
         if self.death_phase == 1: # action pause w/ ghosts hidden
             if not self.play.play_state.is_action_pausing:
-                # START DEATH ANIM
                 # PLAY DEATH SOUND
-                # START ANIM TIMER
-                self.play.play_state.action_pause(90)
+                self.play.sound.music_death()
+                self.play.play_state.action_pause(60*2)
                 self.death_phase = 2
         if self.death_phase == 2:
-            self.lives -= 1
-            self.play.reset()
+            if not self.play.play_state.is_action_pausing:
+                self.lives -= 1
+                self.play.reset()
 
     def draw(self):
         self.update_rect()
         self.pacman_animator.key = self.facing
-        img = self.pacman_animator.imagerect()
+        
+        if self.death_phase == -1:
+            self.image = self.pacman_animator.imagerect()
+        elif self.death_phase == 2:
+            self.image = self.death_animator.imagerect()
 
-        r = img.get_rect()
+        r = self.image.get_rect()
         r.center = self.rect.center
-        self.maze.blit_relative(img, r)
+        self.maze.blit_relative(self.image, r)
 
     def update(self):
         if self.hit:

@@ -8,18 +8,17 @@ class Sound:
     def __init__(self):
         pg.mixer.init()
 
-        soud_game_over = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_death.wav')
         sound_chomp = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_chomp.wav')
         sound_power_pellet = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav')
         sound_eat_ghost = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_eatghost.wav')
         self.sfx = {
-            'game_over': soud_game_over,
             'chomp': sound_chomp,
             'power_pellet': sound_power_pellet,
             'eat_ghost': sound_eat_ghost
         }
 
         self.beginning_audio = f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_beginning.wav'
+        self.death_audio = f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_death.wav'
         self.siren = [f'{app.Application.PROJECT_DIR}/resources/sounds/siren_{x}.wav' for x in range (1,6)]
         self.audio_power_pellet = f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav'
 
@@ -31,6 +30,11 @@ class Sound:
         
         pg.mixer.music.set_volume(0.35)
         self.music_normal()
+
+    def stop_all(self):
+        self.music_stop()
+        self.chomp_channel.stop()
+        self.sfx_channel.stop()
 
     def music_stop(self):
         pg.mixer.music.stop()
@@ -49,6 +53,11 @@ class Sound:
         self.music_stop()
         pg.mixer.music.load(self.audio_power_pellet)
         pg.mixer.music.play(loops=-1)
+    
+    def music_death(self):
+        self.music_stop()
+        pg.mixer.music.load(self.death_audio)
+        pg.mixer.music.play(loops=0)
 
     def start_chomping(self):
         if not self.chomp_channel.get_busy():
