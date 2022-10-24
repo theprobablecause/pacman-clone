@@ -33,7 +33,7 @@ class Scoreboard():
     def save_high_score(self):
         print(f'Attempting to save our score ({self.score}/{self.high_score})')
         self.high_score = self.score if self.high_score < self.score else self.high_score
-        with open('high_score.txt', 'w') as f:
+        with open(f'{app.Application.PROJECT_DIR}/high_score.txt', 'w') as f:
             f.write(str(self.high_score))
         self.prep_score_graphics()
 
