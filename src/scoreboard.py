@@ -16,7 +16,7 @@ class Scoreboard():
         self.screen = play.screen # accessing application screen variable ?
         self.screen_rect = self.screen.get_rect() 
         self.text_color = (255, 255, 255) # white color
-        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 24) # no font type assigned and size 48
+        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 24)
         
         self.score_header = self.font.render("SCORE", True, self.text_color)
         self.score_header_rect = self.score_header.get_rect()

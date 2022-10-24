@@ -36,6 +36,8 @@ class Player(Sprite):
             'right': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_right_{x}.png") for x in [1, 2, 1]]
         }
 
+        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 24)
+
         player_all_closed_sprite = pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_all_closed.png")
 
         for v in player_sprites.values():
@@ -200,7 +202,15 @@ class Player(Sprite):
 
         r = self.image.get_rect()
         r.center = self.rect.center
+        # draw pacman
         self.maze.blit_relative(self.image, r)
+
+        # draw lives
+        for i in range(self.lives):
+            img = self.pacman_animator.dict_frames['right'][1]
+            r = img.get_rect()
+            r.center = (720 + i*50, 200)
+            self.maze.blit_relative(self.pacman_animator.dict_frames['right'][1], r)
 
     def update(self):
         if self.hit:

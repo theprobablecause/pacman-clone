@@ -56,20 +56,18 @@ class Menu():
 
     def draw_anim_frame(self):
             image = self.animation.imagerect()
-            self.img_rect = image.get_rect(center=(600, 400))
-            self.screen.blit(image, self.img_rect)
+            img_rect = image.get_rect(center=(600, 400))
+            self.screen.blit(image, img_rect)
 
     def main_menu(self):
         self.screen.fill((0, 0, 0))
         img_pacman = pg.image.load(application.Application.PROJECT_DIR + "/pacman_img/pacman.png")
         image = pg.transform.scale(img_pacman, (200,200))
         self.img_rect = image.get_rect(center=(575, 110))
-        self.screen.blit(image, self.img_rect)
 
         img_pacmanghost = pg.image.load(application.Application.PROJECT_DIR + "/pacman_img/ghostintro.jpg")
         image2 = pg.transform.scale(img_pacmanghost, (260,160))
         self.img2_rect = image2.get_rect(center=(575, 560))
-        self.screen.blit(image2, self.img2_rect)
 
         self.menu_text = self.get_font(140).render(" PA " + " MAN", True, "White")
         menu_rect = self.menu_text.get_rect(center=(570, 100))
@@ -80,6 +78,7 @@ class Menu():
         self.quit_button = Button(None, pos=(600, 750), text_input="QUIT", font=self.get_font(20), base_color="Yellow", hovering_color="Red")
 
         while True:
+            self.screen.fill((0, 0, 0))
             self.menu_mouse_pos = pg.mouse.get_pos()
 
             for event in pg.event.get():
@@ -103,6 +102,8 @@ class Menu():
                 button.changeColor(self.menu_mouse_pos)
                 button.update(self.screen)
 
+            self.screen.blit(image, self.img_rect)
+            self.screen.blit(image2, self.img2_rect)
             self.screen.blit(self.menu_text, menu_rect)
             self.draw_anim_frame()
             self.app.wait_next_frame()
