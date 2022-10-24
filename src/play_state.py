@@ -64,7 +64,7 @@ class PlayState:
         self.level = 0
         """How many times the player has cleared the maze."""
 
-        self.action_pause = False
+        self.is_action_pausing = False
         """Game will not be player-pausable; this is more for effect."""
 
         self.pause_timer = 0
@@ -86,7 +86,25 @@ class PlayState:
         self.mode_countdown = PlayState.MODE_TIMER[self.mode_ghosts]
         """Frames remaining until mode ends. Should tick down every frame (1/60 of a second)."""
 
+        self.hide_ghosts = False
+        """For animation purposes; hides ghosts."""
+        
+        self.hide_player = False
+        """For animation purposes; hides player."""
+
         self.reset_after_death()
+    
+    def reset(self):
+        self.hide_ghosts = False
+        self.hide_player = False
+        self.frightened_timer = PlayState.MODE_TIMER[gh.GhostMode.FRIGHTENED]
+        self.is_frightened = False
+        self.mode_ghosts = gh.GhostMode.SCATTER
+        self.mode_countdown = PlayState.MODE_TIMER[self.mode_ghosts]
+
+    def action_pause(self, frames):
+        self.pause_timer = frames
+        self.is_action_pausing = True
 
     def power_pellet_eatened(self):
         self.is_frightened = True
@@ -115,10 +133,10 @@ class PlayState:
 
     def update_action_pause(self):
         if self.pause_timer > 0: self.pause_timer -= 1
-        self.action_pause = self.pause_timer > 0
+        self.is_action_pausing = self.pause_timer > 0
 
     def update(self):
         self.update_action_pause()
-        if self.action_pause: return
+        if self.is_action_pausing: return
         
         self.update_ghost_mode()

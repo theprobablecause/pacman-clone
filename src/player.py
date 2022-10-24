@@ -21,11 +21,13 @@ class Player(Sprite):
         'right': (1, 0)
     }
 
+    SPAWN_TILE = (12, 17)
+
     def __init__(self, maze: mz.Maze, play):
         super().__init__()
         self.maze = maze
         self.play = play
-        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE/2, mz.Maze.TILE_SIZE/2))
 
         player_sprites = {
             'up': [pg.image.load(f"{app.Application.PROJECT_DIR}/resources/sprites/pacs_up_{x}.png") for x in [1, 2, 1]],
@@ -58,6 +60,17 @@ class Player(Sprite):
         self.eaten_ghost = None
         """Ghost being eaten."""
 
+        self.hit = False
+
+        self.death_phase = -1
+        """Phase of Pac Man's death.
+        
+        -1: alive
+        0: just got hit; action pause w/ pac man and ghosts visible
+        1: action pause w/ just pac man visible
+        2: animation running
+        3: finally dead"""
+
         self.facing = ''
         self.update_facing()
         self.maze.consume_tile(self.tile)
@@ -68,27 +81,17 @@ class Player(Sprite):
 
         if ghost.mode == gh.GhostMode.FRIGHTENED: # frightened
             ghost.mode = gh.GhostMode.EATEN_INVISIBLE
-            self.play.play_state.pause_timer = 60
-            self.play.play_state.action_pause = True
+            self.play.play_state.action_pause(50)
             self.play.sound.eat_ghost()
             # TODO: replace pacman's sprite with score text
         else: # hostile in all its forms
-            self.hit()
+            self.got_hit()
         
         self.play.sound.stop_chomping()
-        
 
-    def hit(self):
+    def got_hit(self):
         """When Pac Man is hit by a ghost."""
-        pass
-
-    def hit_dying(self):
-        """Begins dying animation."""
-        pass
-
-    def hit_dead(self):
-        """Animation ended; set states."""
-        self.lives -= 1
+        self.hit = True
 
     def update_facing(self):
         """Update `self.facing` based on `self.tile` and `self.tile_next`."""
@@ -108,6 +111,13 @@ class Player(Sprite):
     
     def reset(self):
         """Runs after death animation is finished."""
+        self.tile = Player.SPAWN_TILE
+        self.tile_next = Player.SPAWN_TILE
+        self.tile_progress = 0
+        self.facing = 'right'
+        self.update_tile_next()
+        self.hit = False
+        self.death_phase = -1
         pass
 
     def get_facing_tile(self, direction:str=None):
@@ -131,6 +141,14 @@ class Player(Sprite):
             if state not in [-1, 0, 4]:
                 self.facing = direction
 
+    def update_rect(self):
+        current_tile = Vector(
+            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+        )
+        px = mz.Maze.tile2pixelctr(current_tile)
+        self.rect.center = (px.x, px.y)
+
     def move(self):
         self.tile_progress += self.play.player_speed*app.Application.FRAME_TIME
         if self.tile_progress >= 1:
@@ -139,15 +157,32 @@ class Player(Sprite):
             self.maze.consume_tile(self.tile)
             self.update_tile_next()
             self.update_facing()
+        self.update_rect()
 
-        current_tile = Vector(
-            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
-            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
-        )
-        px = mz.Maze.tile2pixelctr(current_tile)
-        self.rect.center = (px.x, px.y)
+    def dying(self):
+        if self.death_phase == -1: # just got hit
+            self.play.sound.stop_chomping()
+            self.play.sound.music_stop()
+            self.play.play_state.action_pause(60)
+            self.death_phase = 0
+        if self.death_phase == 0:
+            if not self.play.play_state.is_action_pausing:
+                self.play.play_state.hide_ghosts = True
+                self.play.play_state.action_pause(30)
+                self.death_phase = 1
+        if self.death_phase == 1: # action pause w/ ghosts hidden
+            if not self.play.play_state.is_action_pausing:
+                # START DEATH ANIM
+                # PLAY DEATH SOUND
+                # START ANIM TIMER
+                self.play.play_state.action_pause(90)
+                self.death_phase = 2
+        if self.death_phase == 2:
+            self.lives -= 1
+            self.play.reset()
 
     def draw(self):
+        self.update_rect()
         self.pacman_animator.key = self.facing
         img = self.pacman_animator.imagerect()
 
@@ -156,6 +191,8 @@ class Player(Sprite):
         self.maze.blit_relative(img, r)
 
     def update(self):
+        if self.hit:
+            self.dying()
         self.move()
 
 

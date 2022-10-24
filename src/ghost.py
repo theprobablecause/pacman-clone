@@ -45,7 +45,7 @@ class Ghost(Sprite):
         self.pacman = pacman
         self.maze = maze
         self.play = play
-        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE, mz.Maze.TILE_SIZE))
+        self.rect = pg.Rect((0, 0), (mz.Maze.TILE_SIZE/2, mz.Maze.TILE_SIZE/2))
         
         self.tile_start = tile_start
         """The tile to spawn on at the very beginning of a game."""
@@ -53,7 +53,7 @@ class Ghost(Sprite):
         self.tile = tile_start
         """The ghost's last \"steady\" tile."""
 
-        self.tile_next = (2, 1)
+        self.tile_next = None
         """The immediate tile for the ghost to move towards. Should be adjacent to `self.tile`."""
 
         self.tile_scatter = tile_scatter
@@ -69,7 +69,7 @@ class Ghost(Sprite):
         self.facing = 'right'
         """Which way the ghost is currently facing."""
 
-        self.mode: GhostMode = 0
+        self.mode: GhostMode = GhostMode.SCATTER
         """The ghost's current behavior mode. Refer to the `GhostMode` enum."""
 
         self.debug_draw_rect = pg.surface.Surface(size=(24, 24))
@@ -107,6 +107,16 @@ class Ghost(Sprite):
         self.image = self.normal_animator.imagerect()
         self.update_next_tile()
         self.update_facing()
+
+    def reset(self):
+        self.mode = GhostMode.SCATTER
+        self.tile = self.tile_start
+        self.tile_next = None
+        self.tile_progress = 1
+        self.facing = 'right'
+        self.update_next_tile()
+        self.update_facing()
+        self.update_rect()
 
     def set_mode(self, mode):
         if self.mode not in [GhostMode.EATEN, GhostMode.EATEN_INVISIBLE, GhostMode.GHOST_HOUSE_INSIDE, GhostMode.GHOST_HOUSE_JOINING, GhostMode.GHOST_HOUSE_LEAVING]:
@@ -204,13 +214,8 @@ class Ghost(Sprite):
         else:
             speed = self.play.ghosts_speed
         self.tile_progress += speed*app.Application.FRAME_TIME
-        
-        current_tile = Vector(
-            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
-            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
-        )
-        px = mz.Maze.tile2pixelctr(current_tile)
-        self.rect.center = (px.x, px.y)
+
+        self.update_rect()
     
     def flip(self):
         """Flip our movement completely."""
@@ -220,7 +225,20 @@ class Ghost(Sprite):
         self.tile = self.tile_temp
         self.tile_progress = 1 - self.tile_progress
 
+    def update_rect(self):
+        # print(self.tile_progress)
+        current_tile = Vector(
+            lerp(self.tile[0], self.tile_next[0], self.tile_progress),
+            lerp(self.tile[1], self.tile_next[1], self.tile_progress)
+        )
+        px = mz.Maze.tile2pixelctr(current_tile)
+        self.rect.center = (px.x, px.y)
+
     def draw(self):
+        if self.play.play_state.hide_ghosts: return
+
+        self.update_rect()
+
         # graphic retrieval
         if self.mode == GhostMode.FRIGHTENED: # frightened
             self.image = self.frightened_animator.imagerect()
