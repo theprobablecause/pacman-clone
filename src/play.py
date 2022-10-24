@@ -52,7 +52,7 @@ class Play:
             ge.process_events(self)
             self.play_state.update()
 
-            if not self.play_state.action_pause:
+            if not self.play_state.is_action_pausing:
                 self.ghosts.update()
                 self.player.update()
                 self.collision_check()

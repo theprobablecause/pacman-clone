@@ -64,7 +64,7 @@ class PlayState:
         self.level = 0
         """How many times the player has cleared the maze."""
 
-        self.action_pause = False
+        self.is_action_pausing = False
         """Game will not be player-pausable; this is more for effect."""
 
         self.pause_timer = 0
@@ -87,6 +87,10 @@ class PlayState:
         """Frames remaining until mode ends. Should tick down every frame (1/60 of a second)."""
 
         self.reset_after_death()
+
+    def action_pause(self, frames):
+        self.pause_timer = frames
+        self.is_action_pausing = True
 
     def power_pellet_eatened(self):
         self.is_frightened = True
@@ -115,10 +119,10 @@ class PlayState:
 
     def update_action_pause(self):
         if self.pause_timer > 0: self.pause_timer -= 1
-        self.action_pause = self.pause_timer > 0
+        self.is_action_pausing = self.pause_timer > 0
 
     def update(self):
         self.update_action_pause()
-        if self.action_pause: return
+        if self.is_action_pausing: return
         
         self.update_ghost_mode()

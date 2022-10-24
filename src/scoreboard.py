@@ -15,9 +15,16 @@ class Scoreboard():
         self.screen = play.screen # accessing application screen variable ?
         self.screen_rect = self.screen.get_rect() 
         self.text_color = (255, 255, 255) # white color
-        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 16) # no font type assigned and size 48
+        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 24) # no font type assigned and size 48
+        
+        self.score_header = self.font.render("SCORE", True, self.text_color)
+        self.score_header_rect = self.score_header.get_rect()
+        self.score_header_rect.topleft = (self.screen_rect.right - 280, 30)
         self.score_image = None 
         self.score_rect = None
+        self.high_score_header = self.font.render("HIGH SCORE", True, self.text_color)
+        self.high_score_header_rect = self.score_header.get_rect()
+        self.high_score_header_rect.topleft = (self.screen_rect.right - 280, 104)
         self.high_score_image = None
         self.high_score_rect = None
         self.prep_score_graphics()
@@ -45,20 +52,20 @@ class Scoreboard():
 
 
     def prep_score_graphics(self):
-        score_str = f'Score: {str(self.score)}'
-        high_score_str = f'High Score: {str(self.high_score)}'
+        # graphics prep
+        score_str = str(self.score)
+        high_score_str = str(self.high_score)
         self.score_image = self.font.render(score_str, True, self.text_color)
         self.high_score_image = self.font.render(high_score_str, True, self.text_color)
 
-        # Display the score at the top right of the screen.
+        # rects prep
         self.score_rect = self.score_image.get_rect()
-        self.score_rect.right = self.screen_rect.right - 20
-        self.score_rect.top = 20
+        self.score_rect.left = self.screen_rect.right - 280
+        self.score_rect.top = 54
 
-        # Display high score at top middle of screen
         self.high_score_rect = self.high_score_image.get_rect()
-        self.high_score_rect.center = self.screen_rect.center
-        self.high_score_rect.top = 20
+        self.high_score_rect.left = self.screen_rect.right - 280
+        self.high_score_rect.top = 128
 
 
     def reset(self):
@@ -66,19 +73,12 @@ class Scoreboard():
         self.score = 0
         self.update()
 
+    def draw(self):
+        self.screen.blit(self.score_header, self.score_header_rect)
+        self.screen.blit(self.high_score_header, self.high_score_header_rect)
+        self.screen.blit(self.score_image, self.score_rect)
+        self.screen.blit(self.high_score_image, self.high_score_rect)
 
     def update(self):
         self.prep_score_graphics()
         self.draw()
-
-
-    def draw(self):
-        self.screen.blit(self.score_image, self.score_rect)
-        self.screen.blit(self.high_score_image, self.high_score_rect)
-
-
-        
-
-
-
-        

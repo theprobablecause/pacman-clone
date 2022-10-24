@@ -68,8 +68,7 @@ class Player(Sprite):
 
         if ghost.mode == gh.GhostMode.FRIGHTENED: # frightened
             ghost.mode = gh.GhostMode.EATEN_INVISIBLE
-            self.play.play_state.pause_timer = 60
-            self.play.play_state.action_pause = True
+            self.play.play_state.action_pause(50)
             self.play.sound.eat_ghost()
             # TODO: replace pacman's sprite with score text
         else: # hostile in all its forms
