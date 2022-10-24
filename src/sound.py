@@ -19,6 +19,7 @@ class Sound:
             'eat_ghost': sound_eat_ghost
         }
 
+        self.beginning_audio = f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_beginning.wav'
         self.siren = [f'{app.Application.PROJECT_DIR}/resources/sounds/siren_{x}.wav' for x in range (1,6)]
         self.audio_power_pellet = f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav'
 
@@ -38,6 +39,11 @@ class Sound:
         self.music_stop()
         pg.mixer.music.load(self.siren[0])
         pg.mixer.music.play(-1, 0.0)
+
+    def music_beginning(self):
+        self.music_stop()
+        pg.mixer.music.load(self.beginning_audio)
+        pg.mixer.music.play(0, 0.0)
 
     def music_power_pellet(self):
         self.music_stop()
