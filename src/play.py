@@ -44,8 +44,22 @@ class Play:
         if len(cols) > 0:
             g = cols[0]
             self.player.ghost_interact(g)
+    
+    def reset(self):
+        if self.player.lives >= 0:
+            self.play_state.reset()
+            self.player.reset()
+            for g in self.ghosts:
+                g.reset()
+
+            self.play_state.action_pause(120)
+        else:
+            # GAME OVER
+            self.play_state.action_pause(300)
+            pass
 
     def run(self):
+        self.play_state.action_pause(300)
         self.sound.music_normal()
         while True:
             self.screen.fill((0, 0, 0))

@@ -86,7 +86,21 @@ class PlayState:
         self.mode_countdown = PlayState.MODE_TIMER[self.mode_ghosts]
         """Frames remaining until mode ends. Should tick down every frame (1/60 of a second)."""
 
+        self.hide_ghosts = False
+        """For animation purposes; hides ghosts."""
+        
+        self.hide_player = False
+        """For animation purposes; hides player."""
+
         self.reset_after_death()
+    
+    def reset(self):
+        self.hide_ghosts = False
+        self.hide_player = False
+        self.frightened_timer = PlayState.MODE_TIMER[gh.GhostMode.FRIGHTENED]
+        self.is_frightened = False
+        self.mode_ghosts = gh.GhostMode.SCATTER
+        self.mode_countdown = PlayState.MODE_TIMER[self.mode_ghosts]
 
     def action_pause(self, frames):
         self.pause_timer = frames
