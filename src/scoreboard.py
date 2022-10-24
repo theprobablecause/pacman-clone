@@ -2,8 +2,9 @@ import pygame as pg
 import application as app
 
 class Scoreboard():
-    power_pallet_points = 100
     dot_food_points = 10
+    power_pellet_points = 50
+    bonus_fruit = 100
     ghost_points = 200
 
     def __init__(self, play): # game is an instance of application class/game
@@ -28,7 +29,7 @@ class Scoreboard():
         self.high_score_image = None
         self.high_score_rect = None
         self.prep_score_graphics()
-
+        
 
     def save_high_score(self):
         print(f'Attempting to save our score ({self.score}/{self.high_score})')
@@ -38,8 +39,8 @@ class Scoreboard():
         self.prep_score_graphics()
 
 
-    def increment_points_power_pallet(self):
-        self.score = self.score + Scoreboard.power_pallet_points
+    def increment_points_power_pellet(self):
+        self.score = self.score + Scoreboard.power_pellet_points
         self.prep_score_graphics()
 
     def increment_points_ghost(self):
@@ -49,6 +50,10 @@ class Scoreboard():
     def increment_points_dot(self):
         self.score = self.score + Scoreboard.dot_food_points
         self.prep_score_graphics()
+    def increment_points_fruit(self):
+        self.score = self.score + Scoreboard.bonus_fruit
+        self.prep_score_graphics()
+    
 
 
     def prep_score_graphics(self):

@@ -120,7 +120,10 @@ class Maze(Sprite):
         5: bonus fruit
         6: portal a
         7: portal b
-        8: teleport"""
+        8: dot_food_points = 10
+        9: power_pellet_points = 50
+        10: bonus_fruit = 100
+        11: ghost_points = 200 """
         
         if not ((0 <= tile_vec.x and tile_vec.x < Maze.WIDTH) or\
             (0 <= tile_vec.y and tile_vec.y < Maze.HEIGHT)):
@@ -142,6 +145,7 @@ class Maze(Sprite):
             self.maze[strpos] = '1'
             self.play.sound.start_chomping()
             self.remaining_pellets -= 1
+            self.play.scoreboard.increment_points_dot()
             # TODO: change score, counters
         elif state == 3: # power pellet
             self.maze[strpos] = '1'
@@ -149,7 +153,12 @@ class Maze(Sprite):
             self.play.play_state.power_pellet_eatened()
             self.play.sound.music_power_pellet()
             self.remaining_pellets -= 1
+            self.play.scoreboard.increment_points_power_pellet()
             # TODO: change score, counters, flee state
+        elif state == 5: # bonus fruit 
+            self.maze[strpos] = '1'
+            self.play.sound.pacman_eatfruit()
+            self.play.scoreboard.increment_points_fruit()
         elif state == 6: # portal a
             self.play.player.teleport(Maze.PORTAL_B_TILE)
         elif state == 7: # portal b

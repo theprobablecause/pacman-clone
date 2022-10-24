@@ -88,6 +88,7 @@ class Player(Sprite):
             ghost.mode = gh.GhostMode.EATEN_INVISIBLE
             self.play.play_state.action_pause(50)
             self.play.sound.eat_ghost()
+            self.play.scoreboard.increment_points_ghost()
             # TODO: replace pacman's sprite with score text
         else: # hostile in all its forms
             self.got_hit()

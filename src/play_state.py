@@ -109,6 +109,8 @@ class PlayState:
     def power_pellet_eatened(self):
         self.is_frightened = True
         self.frightened_timer = PlayState.MODE_TIMER[gh.GhostMode.FRIGHTENED]
+    
+    
 
     def reset_after_death(self):
         self.portal_a = None
