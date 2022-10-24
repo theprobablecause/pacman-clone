@@ -3,7 +3,7 @@ import pygame as pg
 import play
 from menu import Menu
 
-class Application:
+class Application: # is this class like the game class in space invaders ?
     RESOLUTION = (1280, 800)
     FRAMES_PER_SECOND = 60 # limit the game speed 
     FRAME_TIME = 1.0/FRAMES_PER_SECOND 
@@ -16,7 +16,7 @@ class Application:
 
     def run(self):
         while True: 
-            g = Menu(game=self)
+            g = Menu(app=self)
             g.main_menu()
             
     # Draw current display buffer to screen, then wait for next frame.
