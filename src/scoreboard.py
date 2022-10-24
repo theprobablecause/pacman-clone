@@ -16,7 +16,7 @@ class Scoreboard():
         self.screen = play.screen # accessing application screen variable ?
         self.screen_rect = self.screen.get_rect() 
         self.text_color = (255, 255, 255) # white color
-        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 24) # no font type assigned and size 48
+        self.font = pg.font.Font(f'{app.Application.PROJECT_DIR}/resources/fonts/Press Start 2P.ttf', 24)
         
         self.score_header = self.font.render("SCORE", True, self.text_color)
         self.score_header_rect = self.score_header.get_rect()
@@ -28,8 +28,15 @@ class Scoreboard():
         self.high_score_header_rect.topleft = (self.screen_rect.right - 280, 104)
         self.high_score_image = None
         self.high_score_rect = None
+        self.load_high_score()
         self.prep_score_graphics()
         
+    def load_high_score(self):
+        try:
+            with open(f'{app.Application.PROJECT_DIR}/high_score.txt', 'r') as f:
+                self.high_score = int(f.read())
+        except:
+            self.high_score = 0
 
     def save_high_score(self):
         print(f'Attempting to save our score ({self.score}/{self.high_score})')
