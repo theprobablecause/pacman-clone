@@ -4,6 +4,7 @@ from timer import Timer
 from button import Button
 from play import Play
 import application as app
+from scoreboard import Scoreboard
 
 class Menu():
     def __init__(self, game):
@@ -14,6 +15,7 @@ class Menu():
             wait=1000/60
         )
         pg.display.set_caption("PACMAN Menu")
+        self.scoreboard = Scoreboard(self)
     
     def get_font(self, size):
         return pg.font.Font("resources/fonts/Press Start 2P.ttf", size)
@@ -29,7 +31,7 @@ class Menu():
             self.screen.blit(self.hss_text, self.hss_rect)
 
             #high score
-            self.hsscore_text = self.get_font(50).render("high score displayed", True, "Yellow")
+            self.hsscore_text = self.get_font(50).render(str(self.scoreboard.high_score), True, "Yellow")
             self.hsscore_rect = self.hsscore_text.get_rect(center=(600, 370))
             self.screen.blit(self.hsscore_text, self.hsscore_rect)
 
