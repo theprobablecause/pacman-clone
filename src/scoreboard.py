@@ -28,8 +28,15 @@ class Scoreboard():
         self.high_score_header_rect.topleft = (self.screen_rect.right - 280, 104)
         self.high_score_image = None
         self.high_score_rect = None
+        self.load_high_score()
         self.prep_score_graphics()
         
+    def load_high_score(self):
+        try:
+            with open(f'{app.Application.PROJECT_DIR}/high_score.txt', 'r') as f:
+                self.high_score = int(f.read())
+        except:
+            self.high_score = 0
 
     def save_high_score(self):
         print(f'Attempting to save our score ({self.score}/{self.high_score})')

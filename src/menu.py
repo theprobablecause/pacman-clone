@@ -58,7 +58,6 @@ class Menu():
             image = self.animation.imagerect()
             self.img_rect = image.get_rect(center=(600, 400))
             self.screen.blit(image, self.img_rect)
-        
 
     def main_menu(self):
         self.screen.fill((0, 0, 0))
@@ -92,6 +91,7 @@ class Menu():
                         pg.display.set_caption("PAC MAN")
                         p = Play(app=self.app)
                         p.run()
+                        self.scoreboard.load_high_score()
                     if self.high_score_button.checkForInput(self.menu_mouse_pos):
                         pg.display.set_caption("PACMAN High Score")
                         self.high_score_screen()
