@@ -11,10 +11,13 @@ class Sound:
         sound_chomp = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_chomp.wav')
         sound_power_pellet = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pill_sound.wav')
         sound_eat_ghost = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_eatghost.wav')
+        sound_eat_fruit = pg.mixer.Sound(f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_eatfruit.wav')
+
         self.sfx = {
             'chomp': sound_chomp,
             'power_pellet': sound_power_pellet,
-            'eat_ghost': sound_eat_ghost
+            'eat_ghost': sound_eat_ghost,
+            'eat_fruit': sound_eat_fruit
         }
 
         self.beginning_audio = f'{app.Application.PROJECT_DIR}/resources/sounds/pacman_beginning.wav'
@@ -48,6 +51,9 @@ class Sound:
         self.music_stop()
         pg.mixer.music.load(self.beginning_audio)
         pg.mixer.music.play(0, 0.0)
+    
+    def music_eat_fruit(self):
+        self.sfx_channel.play(self.sfx['eat_fruit'])
 
     def music_power_pellet(self):
         self.music_stop()
@@ -69,10 +75,5 @@ class Sound:
     def eat_ghost(self):
         self.sfx_channel.play(self.sfx['eat_ghost'])
 
-    def game_over(self):
-        self.music_stop()
-        pg.mixer.Sound.play(self.sfx['game_over'])
-        time.sleep(2.8)
-    
     def update(self):
         pass

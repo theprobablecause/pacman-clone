@@ -157,8 +157,8 @@ class Maze(Sprite):
             # TODO: change score, counters, flee state
         elif state == 5: # bonus fruit 
             self.maze[strpos] = '1'
-            self.play.sound.pacman_eatfruit()
             self.play.scoreboard.increment_points_fruit()
+            self.play.sound.music_eat_fruit()
         elif state == 6: # portal a
             self.play.player.teleport(Maze.PORTAL_B_TILE)
         elif state == 7: # portal b
